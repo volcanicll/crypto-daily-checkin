@@ -35,7 +35,7 @@ const coinGecko_daily_check_in = async () => {
       },
     }
   );
-
+  console.log("coingecko-log", response);
   let vp = await response.json();
   return vp;
 };
@@ -71,12 +71,18 @@ const cryptocurrency_daily_check_in = async () => {
     }
   );
 
+  console.log("coinmarket-log", response);
+
   let vp = await response.json();
   return vp;
 };
 
-// coinGecko
-coinGecko_daily_check_in();
+const run = () => {
+  // coinGecko
+  coinGecko_daily_check_in();
 
-// cryptocurrency
-cryptocurrency_daily_check_in();
+  // cryptocurrency
+  cryptocurrency_daily_check_in();
+};
+
+run();

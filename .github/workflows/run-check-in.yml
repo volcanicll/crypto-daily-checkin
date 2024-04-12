@@ -1,4 +1,4 @@
-name: auto check in  示例
+name: auto check in
 
 on:
   schedule:
@@ -8,15 +8,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    env:
+      coingeckoCookie: ${{secrets.COINGECKOCOOKIE}}
+      coingeckoToken: ${{secrets.COINGECKOTOKEN}}
+      coingeckoAuthToken: ${{secrets.COINGECKOAUTHTOKEN}}
+      coinmarketCookie: ${{secrets.COINMARKETCOOKIE}}
+      coinmarketToken: ${{secrets.COINMARKETTOKEN}}
     steps:
-      - name: 检出仓库
+      - name: checkout
         uses: actions/checkout@v3
 
-      - name: 设置 Node.js
+      - name: node-version
         uses: actions/setup-node@v4
         with:
-          node-version: "16" # 指定 Node.js 版本
+          node-version: "16"
 
-      - name: 运行脚本
+      - name: run js
         run: node index.js
