@@ -30,9 +30,7 @@ const coinGecko_daily_check_in = async () => {
         "X-Csrf-Token": process.env.coingeckoToken,
         "X-Requested-With": "XMLHttpRequest",
       },
-      body: {
-        authenticity_token: process.env.coingeckoAuthToken,
-      },
+      body: `authenticity_token=${process.env.coingeckoAuthToken}`,
     }
   );
   console.log("coingecko-log", response);
@@ -41,6 +39,32 @@ const coinGecko_daily_check_in = async () => {
 };
 
 const cryptocurrency_daily_check_in = async () => {
+  const ineligible = await fetch(
+    "https://api.coinmarketcap.com/user-info/v3/user-info/check-ineligible",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: process.env.coinmarketCookie,
+        Origin: "https://coinmarketcap.com",
+        Referer: "https://coinmarketcap.com/",
+        Accept: "application/json, text/plain, */*",
+        "Sec-Ch-Ua":
+          '"Google Chrome";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": "Windows",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-site",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+        "X-Csrf-Token": process.env.coinmarketToken,
+        "X-Requested-With": "XMLHttpRequest",
+      },
+      body: JSON.stringify({}),
+    }
+  );
+
   const response = await fetch(
     "https://api.coinmarketcap.com/asset/v3/loyalty/check-in/",
     {
@@ -65,9 +89,9 @@ const cryptocurrency_daily_check_in = async () => {
         "X-Csrf-Token": process.env.coinmarketToken,
         "X-Requested-With": "XMLHttpRequest",
       },
-      body: {
+      body: JSON.stringify({
         platform: "web",
-      },
+      }),
     }
   );
 
