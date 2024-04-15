@@ -34,8 +34,6 @@ const coinGecko_daily_check_in = async () => {
     }
   );
   console.log("coingecko-log", response);
-  let vp = await response.json();
-  return vp;
 };
 
 const cryptocurrency_daily_check_in = async () => {
@@ -96,9 +94,6 @@ const cryptocurrency_daily_check_in = async () => {
   );
 
   console.log("coinmarket-log", response);
-
-  let vp = await response.json();
-  return vp;
 };
 
 const run = () => {
