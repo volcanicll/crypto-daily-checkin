@@ -14,6 +14,9 @@ jobs:
       coingeckoAuthToken: ${{secrets.COINGECKOAUTHTOKEN}}
       coinmarketCookie: ${{secrets.COINMARKETCOOKIE}}
       coinmarketToken: ${{secrets.COINMARKETTOKEN}}
+      WX_COMPANY_ID: ${{secrets.WX_COMPANY_ID}}
+      WX_APP_ID: ${{secrets.WX_APP_ID}}
+      WX_APP_SECRET: ${{secrets.WX_APP_SECRET}}
     steps:
       - name: checkout
         uses: actions/checkout@v4
