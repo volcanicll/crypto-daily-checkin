@@ -32,10 +32,8 @@ async function wxNotify(config) {
     if (res.errcode === 0) {
       console.log("wx:信息发送成功！");
     }
-    return true;
   } catch (error) {
     console.log("wx:信息发送失败！", error);
-    return false;
   }
 }
 

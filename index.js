@@ -18,8 +18,9 @@ const run = async () => {
     const template = {
       msgtype: "text",
       text: {
-        content: `coinGecko： 『${booleanMap.get(is_coinGecko_success)}』\n
-         cryptocurrency：『${booleanMap.get(is_cryptocurrency_success)}』`,
+        content: `coinGecko： 『${booleanMap.get(
+          is_coinGecko_success
+        )}』\ncoinMarket：『${booleanMap.get(is_cryptocurrency_success)}』`,
       },
     };
 

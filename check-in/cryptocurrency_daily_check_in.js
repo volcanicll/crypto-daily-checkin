@@ -57,8 +57,10 @@ const cryptocurrency_daily_check_in = async () => {
     ).then((response) => response.json());
 
     console.log("coinmarket-log", res);
-
-    return true;
+    const { status } = res;
+    const { error_code, error_message } = status;
+    if (error_code == "0" && error_message == "SUCCESS") return true;
+    return false;
   } catch (error) {
     console.log("error", error);
     return false;

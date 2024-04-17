@@ -33,7 +33,7 @@ const coinGecko_daily_check_in = async () => {
         },
         body: `authenticity_token=${process.env.coingeckoAuthToken}`,
       }
-    ).then((response) => response.json());
+    ).then((response) => response.formData());
 
     console.log("coinGecko_daily_check_in", res);
     return true;
