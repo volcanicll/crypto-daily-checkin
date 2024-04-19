@@ -1,4 +1,6 @@
 const coinGecko_daily_check_in = async () => {
+  const { coingeckoCookie, coingeckoToken, coingeckoAuthToken } = process.env;
+
   try {
     const res = await fetch(
       "https://www.coingecko.com/account/candy/daily_check_in",
@@ -6,7 +8,7 @@ const coinGecko_daily_check_in = async () => {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-          Cookie: process.env.coingeckoCookie,
+          Cookie: coingeckoCookie,
           Origin: "https://www.coingecko.com",
           Referer: "https://www.coingecko.com/account/candy",
           Accept:
@@ -28,12 +30,12 @@ const coinGecko_daily_check_in = async () => {
           "Sec-Fetch-Site": "same-origin",
           "User-Agent":
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
-          "X-Csrf-Token": process.env.coingeckoToken,
+          "X-Csrf-Token": coingeckoToken,
           "X-Requested-With": "XMLHttpRequest",
         },
-        body: `authenticity_token=${process.env.coingeckoAuthToken}`,
+        body: `authenticity_token=${coingeckoAuthToken}`,
       }
-    ).then((response) => response.formData());
+    ).then((response) => response.json());
 
     console.log("coinGecko_daily_check_in", res);
     return true;
