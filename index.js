@@ -1,6 +1,6 @@
 let coinGecko_daily_check_in = require("./check-in/coinGecko_daily_check_in");
 let cryptocurrency_daily_check_in = require("./check-in/cryptocurrency_daily_check_in");
-let wxNotify = require("./wx-notify/index");
+let bot_send_msg = require("./group-bot/index");
 
 const booleanMap = new Map([
   [true, "签到成功"],
@@ -20,11 +20,13 @@ const run = async () => {
       text: {
         content: `coinGecko：『${booleanMap.get(
           is_coinGecko_success
-        )}』\ncoinMarket：『${booleanMap.get(is_cryptocurrency_success)}』`,
+        )}』\ncoinMarket：『${booleanMap.get(
+          is_cryptocurrency_success
+        )}』\n 爱你哦，崽！💖`,
       },
     };
 
-    await wxNotify(template);
+    bot_send_msg(template);
   } catch (error) {
     console.log("error", error);
   }
