@@ -7,6 +7,13 @@ const booleanMap = new Map([
   [false, "签到失败"],
 ]);
 
+const textMap = new Map([
+  [0, "崽！💖", 1, "懒懒！💖", 2, "宝宝！💖", 3, "懒崽！💖", 4, "宝崽！💖"],
+]);
+
+const generateRandomAndCheckDivisibility = () =>
+  (Math.floor(Math.random() * 100) + 1) % 5;
+
 const run = async () => {
   try {
     // coinGecko
@@ -22,7 +29,7 @@ const run = async () => {
           is_coinGecko_success
         )}』\ncoinMarket：『${booleanMap.get(
           is_cryptocurrency_success
-        )}』\n 爱你哦，崽！💖`,
+        )}』\n ${textMap.get(generateRandomAndCheckDivisibility())}`,
       },
     };
 
