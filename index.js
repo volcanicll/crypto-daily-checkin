@@ -33,7 +33,7 @@ const run = async () => {
           is_coinGecko_success
         )}』\ncoinMarket：『${booleanMap.get(
           is_cryptocurrency_success
-        )}』\n ${textMap.get(generateRandomAndCheckDivisibility())}`,
+        )}』\n爱你哦， ${textMap.get(generateRandomAndCheckDivisibility())}`,
       },
     };
 
