@@ -1,22 +1,12 @@
 let coinGecko_daily_check_in = require("./check-in/coinGecko_daily_check_in");
 let cryptocurrency_daily_check_in = require("./check-in/cryptocurrency_daily_check_in");
 let bot_send_msg = require("./group-bot/index");
+let { getRandomGreeting, getCurrentDayOfWeek } = require("./utils");
 
 const booleanMap = new Map([
   [true, "签到成功"],
   [false, "签到失败"],
 ]);
-
-const textMap = new Map([
-  [0, "崽！💖"],
-  [1, "懒懒！💕"],
-  [2, "宝宝！💞"],
-  [3, "懒崽！❤"],
-  [4, "宝崽！💝"],
-]);
-
-const generateRandomAndCheckDivisibility = () =>
-  (Math.floor(Math.random() * 100) + 1) % 5;
 
 const run = async () => {
   try {
@@ -26,14 +16,16 @@ const run = async () => {
     // cryptocurrency
     const is_cryptocurrency_success = await cryptocurrency_daily_check_in();
 
+    let content = `coinGecko：『${booleanMap.get(
+      is_coinGecko_success
+    )}』\ncoinMarket：『${booleanMap.get(
+      is_cryptocurrency_success
+    )}』\n爱你哦， ${getRandomGreeting()}`;
+
     const template = {
       msgtype: "text",
       text: {
-        content: `coinGecko：『${booleanMap.get(
-          is_coinGecko_success
-        )}』\ncoinMarket：『${booleanMap.get(
-          is_cryptocurrency_success
-        )}』\n爱你哦， ${textMap.get(generateRandomAndCheckDivisibility())}`,
+        content: content,
       },
     };
 
