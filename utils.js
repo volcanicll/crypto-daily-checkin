@@ -1,10 +1,10 @@
-export function getCurrentDayOfWeek() {
+function getCurrentDayOfWeek() {
   const daysOfWeek = ["星期天", "周一", "周二", "周三", "周四", "周五", "周六"];
   const today = new Date();
   return daysOfWeek[today.getDay()];
 }
 
-export function getRandomGreeting() {
+function getRandomGreeting() {
   const greetings = new Map([
     [0, "崽！💖"],
     [1, "懒懒！💕"],
