@@ -15,7 +15,7 @@ function getRandomGreeting() {
 
   const randomIndex = Math.floor(Math.random() * greetings.size);
 
-  return greetings[randomIndex];
+  return greetings.get(randomIndex);
 }
 
 module.exports = {
