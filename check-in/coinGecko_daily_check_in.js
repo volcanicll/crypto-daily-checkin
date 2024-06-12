@@ -7,10 +7,10 @@ const coinGecko_daily_check_in = async () => {
       {
         method: "GET",
         headers: {
-          ":authority": "www.coingecko.com",
-          ":method": "GET",
-          ":path": "/accounts/csrf_meta.json",
-          ":scheme": "https",
+          // ":authority": "www.coingecko.com",
+          // ":method": "GET",
+          // ":path": "/accounts/csrf_meta.json",
+          // ":scheme": "https",
           Accept: "*/*",
           "Accept-Encoding": "gzip, deflate, br, zstd",
           "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
@@ -44,10 +44,10 @@ const coinGecko_daily_check_in = async () => {
       {
         method: "POST",
         headers: {
-          ":authority": "www.coingecko.com",
-          ":method": "POST",
-          ":path": "/en/candy/daily_check_in",
-          " :scheme": "https",
+          // ":authority": "www.coingecko.com",
+          // ":method": "POST",
+          // ":path": "/en/candy/daily_check_in",
+          // ":scheme": "https",
           Accept: "*/*",
           "Accept-Encoding": "gzip, deflate, br, zstd",
           "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",

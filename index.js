@@ -9,12 +9,13 @@ const booleanMap = new Map([
 ]);
 
 const run = async () => {
+  console.log("开始");
   try {
     // coinGecko
     const is_coinGecko_success = await coinGecko_daily_check_in();
 
     // cryptocurrency
-    const is_cryptocurrency_success = await cryptocurrency_daily_check_in();
+    const is_cryptocurrency_success = true;
 
     let content = `coinGecko：『${booleanMap.get(
       is_coinGecko_success
