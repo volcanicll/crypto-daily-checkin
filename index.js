@@ -15,7 +15,7 @@ const run = async () => {
     const is_coinGecko_success = await coinGecko_daily_check_in();
 
     // cryptocurrency
-    const is_cryptocurrency_success = true;
+    const is_cryptocurrency_success = await cryptocurrency_daily_check_in();
 
     let content = `coinGecko：『${booleanMap.get(
       is_coinGecko_success
