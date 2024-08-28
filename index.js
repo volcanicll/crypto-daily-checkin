@@ -12,16 +12,18 @@ const run = async () => {
   console.log("开始");
   try {
     // coinGecko
-    const is_coinGecko_success = await coinGecko_daily_check_in();
+    // const is_coinGecko_success = await coinGecko_daily_check_in();
 
     // cryptocurrency
-    const is_cryptocurrency_success = await cryptocurrency_daily_check_in();
+    // const is_cryptocurrency_success = await cryptocurrency_daily_check_in();
 
-    let content = `coinGecko：『${booleanMap.get(
-      is_coinGecko_success
-    )}』\ncoinMarket：『${booleanMap.get(
-      is_cryptocurrency_success
-    )}』\n爱你哦， ${getRandomGreeting()}`;
+    // let content = `coinGecko：『${booleanMap.get(
+    //   is_coinGecko_success
+    // )}』\ncoinMarket：『${booleanMap.get(
+    //   is_cryptocurrency_success
+    // )}』\n爱你哦， ${getRandomGreeting()}`;
+
+    let content = `${getCurrentDayOfWeek()}了。 爱你哦， ${getRandomGreeting()}`;
 
     const template = {
       msgtype: "text",
