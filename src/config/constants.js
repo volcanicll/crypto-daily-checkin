@@ -2,13 +2,16 @@ const BASE_URL = {
   WEIXIN: "https://qyapi.weixin.qq.com",
   COINGECKO: "https://www.coingecko.com",
   COINMARKET: "https://api.coinmarketcap.com",
+  // 免费天气API
+  WEATHER: "https://api.vvhan.com/api/weather",
+  // 免费一言API
+  QINGHUA: "https://api.lovelive.tools/api/SweetNothings/1",
+  // 备用情话API
+  QINGHUA_BACKUP: "https://api.uomg.com/api/rand.qinghua",
   JOKE: "https://api.vvhan.com/api/joke",
-  WEATHER:
-    "https://v0.yiketianqi.com/api?unescape=1&version=v61&appid=43656176&appsecret=I42og6Lm",
   ONE: "https://api.vvhan.com/api/60s",
   POETRY: "https://v1.jinrishici.com/all.json",
   HITOKOTO: "https://v1.hitokoto.cn",
-  QINGHUA: "https://api.vvhan.com/api/sao",
   HISTORY_TODAY: "https://api.vvhan.com/api/hotlist",
 };
 
