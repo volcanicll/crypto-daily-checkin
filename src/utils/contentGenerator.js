@@ -13,7 +13,7 @@ const safeRequest = async (url) => {
 };
 
 // 获取天气信息
-async function getWeather(city = "北京") {
+async function getWeather(city = "重庆") {
   try {
     const data = await safeRequest(
       `${BASE_URL.WEATHER}?city=${encodeURIComponent(city)}`
