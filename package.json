@@ -1,5 +1,5 @@
 {
-  "name": "daily-check-in",
+  "name": "crypto-daily-checkin",
   "version": "1.0.0",
   "description": "自动执行加密货币平台签到并发送通知的工具",
   "main": "src/app.js",
@@ -8,6 +8,7 @@
     "dev": "nodemon src/app.js"
   },
   "keywords": [
+    "crypto",
     "check-in",
     "automation",
     "cryptocurrency",

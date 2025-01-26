@@ -1,4 +1,4 @@
-# 自动签到助手
+# Crypto Daily CheckIn
 
 一个自动执行加密货币平台签到并发送通知的工具。
 
@@ -33,7 +33,6 @@
 # CoinGecko
 COINGECKO_COOKIE=
 COINGECKO_TOKEN=
-COINGECKO_AUTH_TOKEN=
 
 # CoinMarketCap
 COINMARKET_COOKIE=
@@ -62,7 +61,7 @@ npm install
 3. 运行程序
 
 ```bash
-node src/app.js
+npm start
 ```
 
 ## 自动化运行
