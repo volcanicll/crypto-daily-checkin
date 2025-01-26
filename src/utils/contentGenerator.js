@@ -14,25 +14,37 @@ const safeRequest = async (url) => {
 
 // 获取天气信息
 async function getWeather(city = "北京") {
-  const data = await safeRequest(
-    `${BASE_URL.WEATHER}?city=${encodeURIComponent(city)}`
-  );
-  if (!data) return "【天气获取失败】";
+  try {
+    const data = await safeRequest(
+      `${BASE_URL.WEATHER}?city=${encodeURIComponent(city)}`
+    );
+    if (!data || !data.data) return "【天气获取失败】";
 
-  return `【今日天气】
-${data.city} ${data.info.type}
-🌡️ 温度：${data.info.low}℃ ~ ${data.info.high}℃
-💨 风向：${data.info.fengxiang} ${data.info.fengli}
-💡 温馨提示：${data.info.tip || "今天也要开开心心哦！"}`;
+    const weatherData = data.data;
+    return `【今日天气】
+${city} ${weatherData.weather || "未知"}
+🌡️ 温度：${weatherData.temperature || "未知"}
+💨 风向：${weatherData.windDirection || "未知"} ${weatherData.windPower || ""}
+💡 温馨提示：今天也要开开心心哦！`;
+  } catch (error) {
+    console.error("处理天气数据失败:", error);
+    return "【天气获取失败】";
+  }
 }
 
 // 获取土味情话
 async function getLoveWords() {
-  const data = await safeRequest(BASE_URL.QINGHUA);
-  if (!data) return "【情话获取失败】";
+  try {
+    // 使用备用的情话 API
+    const data = await safeRequest("https://api.vvhan.com/api/sao");
+    if (!data) return "【情话获取失败】";
 
-  return `【情话时间】
-${data.ishan}`;
+    return `【情话时间】
+${data.ishan || data}`;
+  } catch (error) {
+    console.error("获取情话失败:", error);
+    return "【情话获取失败】";
+  }
 }
 
 // 生成完整的每日消息
