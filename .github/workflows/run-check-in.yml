@@ -1,4 +1,4 @@
-name: auto check in
+name: Crypto Daily CheckIn
 
 on:
   schedule:
