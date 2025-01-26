@@ -3,11 +3,12 @@ const BASE_URL = {
   COINGECKO: "https://www.coingecko.com",
   COINMARKET: "https://api.coinmarketcap.com",
   JOKE: "https://api.vvhan.com/api/joke",
-  WEATHER: "https://api.vvhan.com/api/weather",
+  WEATHER:
+    "https://v0.yiketianqi.com/api?unescape=1&version=v61&appid=43656176&appsecret=I42og6Lm",
   ONE: "https://api.vvhan.com/api/60s",
   POETRY: "https://v1.jinrishici.com/all.json",
   HITOKOTO: "https://v1.hitokoto.cn",
-  QINGHUA: "https://api.vvhan.com/api/love",
+  QINGHUA: "https://api.vvhan.com/api/sao",
   HISTORY_TODAY: "https://api.vvhan.com/api/hotlist",
 };
 
