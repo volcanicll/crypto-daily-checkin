@@ -1,0 +1,25 @@
+{
+  "name": "daily-check-in",
+  "version": "1.0.0",
+  "description": "自动执行加密货币平台签到并发送通知的工具",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "keywords": [
+    "check-in",
+    "automation",
+    "cryptocurrency",
+    "notification"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
