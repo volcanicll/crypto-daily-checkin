@@ -9,11 +9,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      coingeckoCookie: ${{secrets.COINGECKOCOOKIE}}
-      coingeckoToken: ${{secrets.COINGECKOTOKEN}}
-      coingeckoAuthToken: ${{secrets.COINGECKOAUTHTOKEN}}
-      coinmarketCookie: ${{secrets.COINMARKETCOOKIE}}
-      coinmarketToken: ${{secrets.COINMARKETTOKEN}}
+      COINGECKO_COOKIE: ${{secrets.COINGECKO_COOKIE}}
+      COINGECKO_TOKEN: ${{secrets.COINGECKO_TOKEN}}
+      COINMARKET_COOKIE: ${{secrets.COINMARKET_COOKIE}}
+      COINMARKET_TOKEN: ${{secrets.COINMARKET_TOKEN}}
       WX_COMPANY_ID: ${{secrets.WX_COMPANY_ID}}
       WX_APP_ID: ${{secrets.WX_APP_ID}}
       WX_APP_SECRET: ${{secrets.WX_APP_SECRET}}
@@ -27,5 +26,8 @@ jobs:
         with:
           node-version: "20"
 
+      - name: install dependencies
+        run: npm install
+
       - name: run js
-        run: node index.js
+        run: npm start
