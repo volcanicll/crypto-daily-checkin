@@ -20,8 +20,8 @@ async function run() {
     // const checkInResultText = formatCheckInResult(checkInResults);
     const dayOfWeek = getCurrentDayOfWeek();
 
-    // 获取天气和情话内容
-    const dailyMessage = await generateDailyMessage("北京");
+    // 获取天气和情话内容，设置城市为重庆
+    const dailyMessage = await generateDailyMessage("重庆");
 
     // 组合所有内容
     const messageContent = `${dailyMessage}\n\n${dayOfWeek}了`;
@@ -33,8 +33,8 @@ async function run() {
     };
 
     await Promise.all([
-      wxBotService.sendMessage(messageConfig),
-      // groupBotService.sendMessage(messageConfig),
+      // wxBotService.sendMessage(messageConfig),
+      groupBotService.sendMessage(messageConfig),
     ]);
 
     console.log("执行完成！");
