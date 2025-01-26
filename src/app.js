@@ -30,7 +30,7 @@ async function run() {
 
     await Promise.all([
       wxBotService.sendMessage(messageConfig),
-      groupBotService.sendMessage(messageConfig),
+      // groupBotService.sendMessage(messageConfig),
     ]);
 
     console.log("执行完成！");
