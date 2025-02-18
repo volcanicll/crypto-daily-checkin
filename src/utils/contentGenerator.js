@@ -4,8 +4,11 @@ const { BASE_URL } = require("../config/constants");
 // 统一的错误处理
 const safeRequest = async (url) => {
   try {
-    const response = await axios.get(url, { timeout: 5000 });
-    return response.data;
+    const response = await axios.get(url, {
+      timeout: 5000,
+      maxRedirects: 5, // 设置最大重定向次数
+    });
+    return response;
   } catch (error) {
     console.error(`请求 ${url} 失败:`, error.message);
     return null;
@@ -18,35 +21,33 @@ async function getWeather(city = "重庆") {
     // 尝试所有可用的天气 API
     const weatherApis = [
       BASE_URL.WEATHER,
-      "https://api.vvhan.com/api/weather", // 备用API 1
-      "https://tianqiapi.com/api", // 备用API 2
-      "https://www.yiketianqi.com/api", // 备用API 3
+      "https://tianqiapi.com/api", // 备用API 1
+      "https://www.yiketianqi.com/api", // 备用API 2
     ];
 
     let weatherData = null;
     for (const api of weatherApis) {
-      const data = await safeRequest(`${api}?city=${encodeURIComponent(city)}`);
-      if (data && data.info) {
-        weatherData = data;
+      const res = await safeRequest(`${api}?city=${encodeURIComponent(city)}`);
+      if (res && res.data) {
+        weatherData = res.data;
         break;
       }
     }
-
     if (!weatherData) {
-      return `【今日天气】
+      return `【天气接口摸鱼了哦...】
 亲爱的，天气接口暂时出小差了呢 🥺
 不过没关系，记得带伞带外套，注意保暖降温哦！
 💝 温馨提示：天气不是问题，心情最重要，今天也要开开心心的！`;
     }
 
-    return `【今日天气】
-${city} ${weatherData.info.type}
-🌡️ 温度：${weatherData.info.low}℃ ~ ${weatherData.info.high}℃
-💨 风向：${weatherData.info.fengxiang} ${weatherData.info.fengli}
-💡 温馨提示：${weatherData.info.tip || "今天也要像太阳一样闪耀哦！✨"}`;
+    return `【今日天气🌤️】
+${city} ${weatherData.data.type}
+🌡️ 温度：${weatherData.data.low}℃ ~ ${weatherData.data.high}℃
+💨 风向：${weatherData.data.fengxiang} ${weatherData.data.fengli}
+💡 温馨提示：${weatherData.tip || "今天也要像太阳一样闪耀哦！✨"}`;
   } catch (error) {
     console.error("处理天气数据失败:", error);
-    return `【今日天气】
+    return `【今日天气接口不干活了...】
 亲爱的宝贝，虽然天气数据获取失败了 🌧
 但是不要担心呢，记得：
 🌂 带把伞~以防万一
@@ -60,10 +61,9 @@ async function getLoveWords() {
   try {
     // 尝试所有可用的情话 API
     const loveApisConfig = [
-      { url: BASE_URL.QINGHUA, path: "returnObj" },
       { url: BASE_URL.QINGHUA_BACKUP, path: "content" },
       { url: BASE_URL.HITOKOTO, path: "hitokoto" },
-      { url: "https://api.vvhan.com/api/love", path: "data" },
+      { url: BASE_URL.QINGHUA, path: "returnObj" },
     ];
 
     let loveMessage = null;
@@ -76,16 +76,16 @@ async function getLoveWords() {
     }
 
     if (!loveMessage) {
-      return `【温馨话语】
+      return `【💞 Love 💞】
 亲爱的，你是我所有美好故事的开始 💝
 永远爱你，今天也要开心哦！✨`;
     }
 
-    return `【温馨话语】
+    return `【💕 每日情话 💕】
 ${loveMessage}`;
   } catch (error) {
     console.error("获取情话失败:", error);
-    return `【温馨话语】
+    return `【💝】
 即使所有情话都说不出口，
 但我的心意永远都在哦！💕
 今天也要元气满满，开开心心！🌈`;

@@ -21,13 +21,13 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
 
-      - name: node-version
-        uses: actions/setup-node@v4
+      - name: setup bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: "20"
+          bun-version: latest
 
       - name: install dependencies
-        run: npm install
+        run: bun install
 
       - name: run js
-        run: npm start
+        run: bun run start

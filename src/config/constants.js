@@ -12,7 +12,6 @@ const BASE_URL = {
   ONE: "https://api.vvhan.com/api/60s",
   POETRY: "https://v1.jinrishici.com/all.json",
   HITOKOTO: "https://v1.hitokoto.cn",
-  HISTORY_TODAY: "https://api.vvhan.com/api/hotlist",
 };
 
 const GREETINGS = new Map([
