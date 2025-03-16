@@ -68,7 +68,7 @@ async function getLoveWords() {
 
     let loveMessage = null;
     for (const api of loveApisConfig) {
-      const data = await safeRequest(api.url);
+      const { data = {} } = await safeRequest(api.url);
       if (data && data[api.path]) {
         loveMessage = data[api.path];
         break;

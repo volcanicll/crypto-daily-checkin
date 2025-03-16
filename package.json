@@ -1,7 +1,7 @@
 {
   "name": "crypto-daily-checkin",
   "version": "1.0.0",
-  "description": "自动执行加密货币平台签到并发送通知的工具",
+  "description": "Daily warm heart push",
   "main": "src/app.js",
   "scripts": {
     "start": "bun src/app.js",
@@ -18,7 +18,7 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^1.6.0",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.4.7",
     "node-fetch": "^3.3.2"
   },
   "devDependencies": {
