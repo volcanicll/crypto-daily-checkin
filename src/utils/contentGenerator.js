@@ -1,5 +1,9 @@
 const axios = require("axios");
 const { BASE_URL } = require("../config/constants");
+const { getMarketData } = require("../services/crypto/market");
+const { getCryptoNews } = require("../services/crypto/news");
+
+const https = require('https');
 
 // 统一的错误处理
 const safeRequest = async (url) => {
@@ -7,6 +11,7 @@ const safeRequest = async (url) => {
     const response = await axios.get(url, {
       timeout: 5000,
       maxRedirects: 5, // 设置最大重定向次数
+      httpsAgent: new https.Agent({ rejectUnauthorized: false })
     });
     return response;
   } catch (error) {
@@ -68,7 +73,8 @@ async function getLoveWords() {
 
     let loveMessage = null;
     for (const api of loveApisConfig) {
-      const { data = {} } = await safeRequest(api.url);
+      const response = await safeRequest(api.url);
+      const data = response?.data || {};
       if (data && data[api.path]) {
         loveMessage = data[api.path];
         break;
@@ -92,12 +98,55 @@ ${loveMessage}`;
   }
 }
 
+// 获取加密货币信息
+async function getCryptoInfo() {
+  try {
+    const [marketData, newsData] = await Promise.all([
+      getMarketData(),
+      getCryptoNews()
+    ]);
+
+    let message = "【💰 今日币圈 💰】\n";
+
+    // Market Data
+    if (marketData.length > 0) {
+      message += "📊 市场行情 (24h):\n";
+      marketData.forEach(coin => {
+        const price = coin.current_price.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+        const change = coin.price_change_percentage_24h.toFixed(2);
+        const icon = change >= 0 ? "📈" : "📉";
+        message += `${icon} ${coin.symbol}: ${price} (${change > 0 ? '+' : ''}${change}%)\n`;
+      });
+      message += "\n";
+    }
+
+    // News Data
+    if (newsData.length > 0) {
+      message += "📰 最新资讯:\n";
+      newsData.slice(0, 3).forEach((news, index) => {
+        message += `${index + 1}. ${news.title}\n`;
+      });
+    }
+
+    return message;
+  } catch (error) {
+    console.error("获取加密货币信息失败:", error);
+    return "【💰 币圈数据暂时获取失败...】";
+  }
+}
+
 // 生成完整的每日消息
 async function generateDailyMessage(city) {
   try {
     const greeting = getRandomGreeting();
-    const parts = await Promise.all([getWeather(city), getLoveWords()]);
-    return `${greeting}\n\n${parts.join("\n\n")}`;
+    const parts = await Promise.all([
+      getWeather(city),
+      getCryptoInfo(),
+      getLoveWords()
+    ]);
+    const message = `${greeting}\n\n${parts.join("\n\n")}`;
+    console.log("Generated Message Preview:\n", message);
+    return message;
   } catch (error) {
     console.error("生成消息失败:", error);
     return `${getRandomGreeting()}\n\n亲爱的宝贝，
@@ -120,4 +169,5 @@ module.exports = {
   generateDailyMessage,
   getWeather,
   getLoveWords,
+  getCryptoInfo,
 };

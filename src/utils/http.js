@@ -1,45 +1,44 @@
+const axios = require('axios');
+
 class HttpClient {
-  constructor(baseUrl, defaultHeaders = {}) {
-    this.baseUrl = baseUrl;
-    this.defaultHeaders = defaultHeaders;
+  constructor(baseURL = '') {
+    this.instance = axios.create({
+      baseURL,
+      timeout: 10000,
+      headers: {
+        // 'Content-Type': 'application/json' // Removed to avoid issues with some APIs
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      }
+    });
+
+    // Add response interceptor for error handling
+    this.instance.interceptors.response.use(
+      response => response,
+      error => {
+        console.error('API Request Error:', error.message);
+        return Promise.reject(error);
+      }
+    );
   }
 
-  async request(path, options = {}) {
-    const url = `${this.baseUrl}${path}`;
-    const headers = { ...this.defaultHeaders, ...options.headers };
-
+  async get(url, config = {}) {
     try {
-      const response = await fetch(url, {
-        ...options,
-        headers,
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const contentType = response.headers.get("content-type");
-      if (contentType?.includes("application/json")) {
-        return response.json();
-      }
-      return response.text();
+      const response = await this.instance.get(url, config);
+      return response.data;
     } catch (error) {
-      console.error(`Request failed: ${url}`, error);
       throw error;
     }
   }
 
-  async get(path, options = {}) {
-    return this.request(path, { ...options, method: "GET" });
-  }
-
-  async post(path, data, options = {}) {
-    return this.request(path, {
-      ...options,
-      method: "POST",
-      body: JSON.stringify(data),
-    });
+  async post(url, data, config = {}) {
+    try {
+      const response = await this.instance.post(url, data, config);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 }
 
 module.exports = HttpClient;
+

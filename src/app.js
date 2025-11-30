@@ -2,6 +2,7 @@ const coinGeckoService = require("./services/checkin/coinGecko");
 const coinMarketService = require("./services/checkin/coinMarket");
 const wxBotService = require("./services/notification/wxBot/WxBotService");
 const groupBotService = require("./services/notification/groupBot/GroupBotService");
+const telegramBotService = require("./services/notification/telegram/TelegramBotService");
 const { getCurrentDayOfWeek } = require("./utils/date");
 const { formatCheckInResult } = require("./utils/message");
 const { generateDailyMessage } = require("./utils/contentGenerator");
@@ -35,6 +36,7 @@ async function run() {
     await Promise.all([
       // wxBotService.sendMessage(messageConfig),
       groupBotService.sendMessage(messageConfig),
+      telegramBotService.sendMessage(messageContent),
     ]);
 
     console.log("执行完成！");
