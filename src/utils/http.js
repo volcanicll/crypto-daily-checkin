@@ -1,5 +1,7 @@
 const axios = require('axios');
 
+const https = require('https');
+
 class HttpClient {
   constructor(baseURL = '') {
     this.instance = axios.create({
@@ -8,7 +10,8 @@ class HttpClient {
       headers: {
         // 'Content-Type': 'application/json' // Removed to avoid issues with some APIs
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-      }
+      },
+      httpsAgent: new https.Agent({ rejectUnauthorized: false })
     });
 
     // Add response interceptor for error handling

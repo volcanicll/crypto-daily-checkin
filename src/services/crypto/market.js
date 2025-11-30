@@ -13,7 +13,8 @@ async function getMarketData() {
         const symbols = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT'];
         const promises = symbols.map(symbol =>
             http.get(`${BINANCE_API_URL}/ticker/24hr`, {
-                params: { symbol }
+                params: { symbol },
+                timeout: 15000 // Increase timeout to 15s
             })
         );
 

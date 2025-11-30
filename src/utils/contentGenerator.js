@@ -2,6 +2,9 @@ const axios = require("axios");
 const { BASE_URL } = require("../config/constants");
 const { getMarketData } = require("../services/crypto/market");
 const { getCryptoNews } = require("../services/crypto/news");
+const { getGoldPrice } = require("../services/finance/gold");
+const { getAiNews } = require("../services/tech/aiNews");
+const { getFearAndGreedIndex } = require("../services/crypto/sentiment");
 
 const https = require('https');
 
@@ -101,12 +104,18 @@ ${loveMessage}`;
 // 获取加密货币信息
 async function getCryptoInfo() {
   try {
-    const [marketData, newsData] = await Promise.all([
+    const [marketData, newsData, sentimentData] = await Promise.all([
       getMarketData(),
-      getCryptoNews()
+      getCryptoNews(),
+      getFearAndGreedIndex()
     ]);
 
-    let message = "【💰 今日币圈 💰】\n";
+    let message = "【💰 今日行情 💰】\n";
+
+    // Sentiment Data (Fear & Greed)
+    if (sentimentData) {
+      message += `🧠 恐慌贪婪指数: ${sentimentData.value} (${sentimentData.classification})\n\n`;
+    }
 
     // Market Data
     if (marketData.length > 0) {
@@ -120,11 +129,11 @@ async function getCryptoInfo() {
       message += "\n";
     }
 
-    // News Data
+    // News Data with Links
     if (newsData.length > 0) {
       message += "📰 最新资讯:\n";
-      newsData.slice(0, 3).forEach((news, index) => {
-        message += `${index + 1}. ${news.title}\n`;
+      newsData.slice(0, 5).forEach((news, index) => {
+        message += `${index + 1}. [${news.title}](${news.url})\n`;
       });
     }
 
@@ -135,16 +144,68 @@ async function getCryptoInfo() {
   }
 }
 
+// 获取黄金价格信息
+async function getGoldInfo() {
+  try {
+    const goldData = await getGoldPrice();
+    if (!goldData.ny_gold && !goldData.cn_gold) return "";
+
+    let message = "【🏆 今日金价 🏆】\n";
+
+    if (goldData.cn_gold) {
+      const { price, change_percent, name } = goldData.cn_gold;
+      const icon = change_percent >= 0 ? "📈" : "📉";
+      message += `${icon} ${name}: ¥${price.toFixed(2)}/g (${change_percent > 0 ? '+' : ''}${change_percent.toFixed(2)}%)\n`;
+    }
+
+    if (goldData.ny_gold) {
+      const { price, change_percent, name } = goldData.ny_gold;
+      const icon = change_percent >= 0 ? "📈" : "📉";
+      message += `${icon} ${name}: $${price.toFixed(2)}/oz (${change_percent > 0 ? '+' : ''}${change_percent.toFixed(2)}%)\n`;
+    }
+
+    return message;
+  } catch (error) {
+    console.error("获取黄金信息失败:", error);
+    return "";
+  }
+}
+
+// 获取AI新闻信息
+async function getAiInfo() {
+  try {
+    const aiNews = await getAiNews();
+    if (aiNews.length === 0) return "";
+
+    let message = "【🤖 AI 前沿资讯 🤖】\n";
+    aiNews.forEach((news, index) => {
+      message += `${index + 1}. [${news.title}](${news.url})\n`;
+    });
+
+    return message;
+  } catch (error) {
+    console.error("获取AI新闻失败:", error);
+    return "";
+  }
+}
+
 // 生成完整的每日消息
 async function generateDailyMessage(city) {
   try {
-    const greeting = getRandomGreeting();
+    // const greeting = getRandomGreeting();
+    // Order: Gold -> Weather -> Crypto -> AI News -> Love Words
     const parts = await Promise.all([
-      getWeather(city),
+      getGoldInfo(),
+      // getWeather(city),
       getCryptoInfo(),
-      getLoveWords()
+      getAiInfo(),
+      // getLoveWords()
     ]);
-    const message = `${greeting}\n\n${parts.join("\n\n")}`;
+
+    // Filter out empty strings
+    const validParts = parts.filter(part => part && part.trim() !== "");
+
+    const message = `${validParts.join("\n\n")}`;
     console.log("Generated Message Preview:\n", message);
     return message;
   } catch (error) {
@@ -170,4 +231,6 @@ module.exports = {
   getWeather,
   getLoveWords,
   getCryptoInfo,
+  getGoldInfo,
+  getAiInfo,
 };
