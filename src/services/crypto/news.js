@@ -21,6 +21,21 @@ const AI_SOURCES = [
         name: 'MIT Technology Review AI',
         url: 'https://www.technologyreview.com/topic/artificial-intelligence/feed',
         isRss: true
+    },
+    {
+        name: 'Google AI Blog',
+        url: 'https://research.google/blog/rss',
+        isRss: true
+    },
+    {
+        name: 'OpenAI Blog',
+        url: 'https://openai.com/news/rss.xml',
+        isRss: true
+    },
+    {
+        name: 'ArXiv CS.AI',
+        url: 'https://rss.arxiv.org/rss/cs.ai',
+        isRss: true
     }
 ];
 
@@ -122,7 +137,7 @@ async function getCryptoNews() {
 }
 
 /**
- * Fetch AI news from defined sources (RSS)
+ * Fetch AI news from defined sources (RSS/Atom)
  * @returns {Promise<Array>}
  */
 async function getAINews() {
@@ -131,6 +146,9 @@ async function getAINews() {
     for (const source of AI_SOURCES) {
         try {
             console.log(`Fetching AI news from ${source.name}...`);
+            // Use axios directly or http wrapper. Note: Some RSS feeds might need User-Agent.
+            // ArXiv sometimes blocks requests without proper User-Agent or if too frequent.
+
             const xml = await http.get(source.url, {
                 responseType: 'text',
                 headers: {
@@ -142,13 +160,45 @@ async function getAINews() {
             const $ = cheerio.load(xml, { xmlMode: true });
             const items = [];
 
-            $('item').each((i, el) => {
-                if (i >= 3) return false; // Limit to 3 items per source
+            // Handle both RSS (<item>) and Atom (<entry>)
+            const entryNodes = $('item, entry');
 
-                const title = $(el).find('title').text().trim();
-                const link = $(el).find('link').text().trim();
-                const description = $(el).find('description').text().replace(/<[^>]*>?/gm, '').trim(); // Strip HTML from desc
-                const pubDate = $(el).find('pubDate').text().trim();
+            entryNodes.each((i, el) => {
+                if (i >= 5) return false; // Limit to 5 items per source
+
+                const $el = $(el);
+
+                // Title
+                const title = $el.find('title').text().trim();
+
+                // Link: Simple RSS vs Atom <link href="...">
+                let link = $el.find('link').text().trim();
+                if (!link) {
+                    link = $el.find('link').attr('href');
+                }
+
+                // Description/Summary/Content
+                let description = $el.find('description').text();
+                if (!description) {
+                    description = $el.find('summary').text();
+                }
+                if (!description) {
+                    description = $el.find('content').text();
+                }
+                // Strip HTML
+                description = description.replace(/<[^>]*>?/gm, '').trim();
+                // Decode HTML entities if needed (cheerio handles some)
+                // Normalize whitespace
+                description = description.replace(/\s+/g, ' ');
+
+                // Date
+                let pubDate = $el.find('pubDate').text().trim();
+                if (!pubDate) {
+                    pubDate = $el.find('published').text().trim();
+                }
+                if (!pubDate) {
+                    pubDate = $el.find('updated').text().trim();
+                }
 
                 if (title && link) {
                     items.push({
@@ -156,7 +206,7 @@ async function getAINews() {
                         description: description.substring(0, 200) + '...', // Truncate description
                         url: link,
                         author: source.name,
-                        posted_on: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString()
+                        posted_on: pubDate ? (new Date(pubDate).toISOString() || new Date().toISOString()) : new Date().toISOString()
                     });
                 }
             });
@@ -170,11 +220,16 @@ async function getAINews() {
     // Translate AI news sequentially
     const translatedAiNews = [];
     for (const item of allNews) {
-        translatedAiNews.push({
-            ...item,
-            title: await translateToChinese(item.title),
-            description: await translateToChinese(item.description)
-        });
+        try {
+            translatedAiNews.push({
+                ...item,
+                title: await translateToChinese(item.title),
+                description: await translateToChinese(item.description)
+            });
+        } catch (transError) {
+            console.warn(`Failed to translate item from ${item.author}: ${transError.message}`);
+            translatedAiNews.push(item); // Fallback to original
+        }
         await new Promise(r => setTimeout(r, 200));
     }
 
