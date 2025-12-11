@@ -1,44 +1,142 @@
 const HttpClient = require('../../utils/http');
 const http = new HttpClient();
+const cheerio = require('cheerio');
+const { translateToChinese } = require('../../utils/common');
+
+const AI_SOURCES = [
+    {
+        name: 'TechCrunch AI',
+        url: 'https://techcrunch.com/category/artificial-intelligence/feed/',
+        isRss: true
+    },
+    {
+        name: 'VentureBeat AI',
+        url: 'https://venturebeat.com/category/ai/feed/',
+        isRss: true
+    },
+    {
+        name: 'MIT Technology Review AI',
+        url: 'https://www.technologyreview.com/topic/artificial-intelligence/feed',
+        isRss: true
+    },
+    {
+        name: 'Google AI Blog',
+        url: 'https://research.google/blog/rss',
+        isRss: true
+    },
+    {
+        name: 'OpenAI Blog',
+        url: 'https://openai.com/news/rss.xml',
+        isRss: true
+    },
+    {
+        name: 'ArXiv CS.AI',
+        url: 'https://rss.arxiv.org/rss/cs.ai',
+        isRss: true
+    }
+];
+
 
 /**
- * Fetch AI News from Hacker News
- * Filters top stories for AI-related keywords.
+ * Fetch AI news from defined sources (RSS/Atom)
+ * @returns {Promise<Array>}
  */
-async function getAiNews() {
-    try {
-        // 1. Get top stories IDs
-        const topStoriesIds = await http.get('https://hacker-news.firebaseio.com/v0/topstories.json');
+async function getAINews() {
+    const allNews = [];
 
-        // 2. Fetch details for top 15 stories (to save time/bandwidth)
-        const recentIds = topStoriesIds.slice(0, 15);
-        const storyPromises = recentIds.map(id =>
-            http.get(`https://hacker-news.firebaseio.com/v0/item/${id}.json`)
-        );
+    for (const source of AI_SOURCES) {
+        try {
+            console.log(`Fetching AI news from ${source.name}...`);
+            // Use axios directly or http wrapper. Note: Some RSS feeds might need User-Agent.
+            // ArXiv sometimes blocks requests without proper User-Agent or if too frequent.
 
-        const stories = await Promise.all(storyPromises);
+            const xml = await http.get(source.url, {
+                responseType: 'text',
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    'Accept': 'application/rss+xml,application/xml,text/xml,*/*'
+                }
+            });
 
-        // 3. Filter for AI keywords
-        const aiKeywords = ['AI', 'GPT', 'LLM', 'OpenAI', 'DeepMind', 'Anthropic', 'Llama', 'Neural', 'Machine Learning', 'Artificial Intelligence'];
-        const aiNews = stories.filter(story => {
-            if (!story || !story.title) return false;
-            const text = story.title.toLowerCase();
-            return aiKeywords.some(kw => text.includes(kw.toLowerCase()));
-        });
+            const $ = cheerio.load(xml, { xmlMode: true });
+            const items = [];
 
-        return aiNews.slice(0, 10).map(item => ({
-            title: item.title,
-            summary: '', // HN doesn't have summary usually
-            url: item.url || `https://news.ycombinator.com/item?id=${item.id}`,
-            time: new Date(item.time * 1000).toISOString()
-        }));
+            // Handle both RSS (<item>) and Atom (<entry>)
+            const entryNodes = $('item, entry');
 
-    } catch (error) {
-        console.error('Error fetching AI news:', error.message);
-        return [];
+            entryNodes.each((i, el) => {
+                if (i >= 5) return false; // Limit to 5 items per source
+
+                const $el = $(el);
+
+                // Title
+                const title = $el.find('title').text().trim();
+
+                // Link: Simple RSS vs Atom <link href="...">
+                let link = $el.find('link').text().trim();
+                if (!link) {
+                    link = $el.find('link').attr('href');
+                }
+
+                // Description/Summary/Content
+                let description = $el.find('description').text();
+                if (!description) {
+                    description = $el.find('summary').text();
+                }
+                if (!description) {
+                    description = $el.find('content').text();
+                }
+                // Strip HTML
+                description = description.replace(/<[^>]*>?/gm, '').trim();
+                // Decode HTML entities if needed (cheerio handles some)
+                // Normalize whitespace
+                description = description.replace(/\s+/g, ' ');
+
+                // Date
+                let pubDate = $el.find('pubDate').text().trim();
+                if (!pubDate) {
+                    pubDate = $el.find('published').text().trim();
+                }
+                if (!pubDate) {
+                    pubDate = $el.find('updated').text().trim();
+                }
+
+                if (title && link) {
+                    items.push({
+                        title,
+                        description: description.substring(0, 200) + '...', // Truncate description
+                        url: link,
+                        author: source.name,
+                        posted_on: pubDate ? (new Date(pubDate).toISOString() || new Date().toISOString()) : new Date().toISOString()
+                    });
+                }
+            });
+
+            allNews.push(...items);
+        } catch (error) {
+            console.error(`Error fetching ${source.name}:`, error.message);
+        }
     }
+
+    // Translate AI news sequentially
+    const translatedAiNews = [];
+    for (const item of allNews) {
+        try {
+            translatedAiNews.push({
+                ...item,
+                title: await translateToChinese(item.title),
+                description: await translateToChinese(item.description)
+            });
+        } catch (transError) {
+            console.warn(`Failed to translate item from ${item.author}: ${transError.message}`);
+            translatedAiNews.push(item); // Fallback to original
+        }
+        await new Promise(r => setTimeout(r, 200));
+    }
+
+    return translatedAiNews;
 }
 
 module.exports = {
-    getAiNews
+    getAINews
 };

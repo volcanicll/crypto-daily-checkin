@@ -27,7 +27,7 @@ async function fetchWithRetry(fetchFn, retries = 3) {
  * @returns {Promise<Array>}
  */
 async function getBinanceData() {
-    const symbols = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT'];
+    const symbols = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT'];
     const promises = symbols.map(symbol =>
         http.get(`${BINANCE_API_URL}/ticker/24hr`, {
             params: { symbol },
@@ -56,7 +56,7 @@ async function getCoinGeckoData() {
     const response = await http.get(`${COINGECKO_API_URL}/coins/markets`, {
         params: {
             vs_currency: 'usd',
-            ids: 'bitcoin,ethereum,solana'
+            ids: 'bitcoin,ethereum,solana,binancecoin'
         },
         timeout: 10000
     });

@@ -7,9 +7,9 @@ const http = new HttpClient();
  */
 async function getGoldPrice() {
     try {
-        // hf_XAU: NY Gold (USD/oz)
-        // gds_AUTD: Shanghai Gold (CNY/g)
-        const response = await http.get('http://hq.sinajs.cn/list=hf_XAU,gds_AUTD', {
+        // hf_XAU: NY Gold (USD/oz), hf_XAG: NY Silver
+        // gds_AUTD: Shanghai Gold (CNY/g), gds_AGTD: Shanghai Silver
+        const response = await http.get('http://hq.sinajs.cn/list=hf_XAU,gds_AUTD,hf_XAG,gds_AGTD', {
             headers: {
                 'Referer': 'https://finance.sina.com.cn/',
                 // 'User-Agent': 'Mozilla/5.0 ...' // Already set in http.js
@@ -46,6 +46,30 @@ async function getGoldPrice() {
                     price: current,
                     change_percent: changePercent,
                     name: '上海金 (AU T+D)',
+                    currency: 'CNY'
+                };
+            } else if (code === 'hf_XAG') {
+                // NY Silver
+                const current = parseFloat(data[0]);
+                const prevClose = parseFloat(data[7]);
+                const changePercent = prevClose ? ((current - prevClose) / prevClose * 100) : 0;
+
+                results.ny_silver = {
+                    price: current,
+                    change_percent: changePercent,
+                    name: '纽约银 (XAG)',
+                    currency: 'USD'
+                };
+            } else if (code === 'gds_AGTD') {
+                // Shanghai Silver
+                const current = parseFloat(data[0]);
+                const prevClose = parseFloat(data[7]);
+                const changePercent = prevClose ? ((current - prevClose) / prevClose * 100) : 0;
+
+                results.cn_silver = {
+                    price: current,
+                    change_percent: changePercent,
+                    name: '上海银 (AG T+D)',
                     currency: 'CNY'
                 };
             }

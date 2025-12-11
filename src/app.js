@@ -5,7 +5,7 @@ const groupBotService = require("./services/notification/groupBot/GroupBotServic
 const telegramBotService = require("./services/notification/telegram/TelegramBotService");
 const { getCurrentDayOfWeek } = require("./utils/date");
 const { formatCheckInResult } = require("./utils/message");
-const { generateDailyMessage } = require("./utils/contentGenerator");
+const dailyReportGenerator = require("./services/DailyReportGenerator");
 
 async function run() {
   console.log("开始执行自动签到...");
@@ -22,7 +22,7 @@ async function run() {
     const dayOfWeek = getCurrentDayOfWeek();
 
     // 获取天气和情话内容，设置城市为重庆
-    const dailyMessage = await generateDailyMessage("重庆");
+    const dailyMessage = await dailyReportGenerator.generateDailyMessage("重庆");
 
     // 组合所有内容
     const messageContent = `${dailyMessage}\n\n${dayOfWeek}了`;
