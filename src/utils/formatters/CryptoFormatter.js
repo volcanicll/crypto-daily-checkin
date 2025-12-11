@@ -29,7 +29,7 @@ const formatCrypto = ({ marketData, newsData, sentimentData }) => {
     // News Data with Links
     if (newsData && newsData.length > 0) {
         message += "📰 最新资讯:\n";
-        newsData.slice(0, 5).forEach((news, index) => {
+        newsData.slice(0, 20).forEach((news, index) => {
             message += `${index + 1}. [${news.title}](${news.url})\n`;
         });
     }
@@ -40,7 +40,7 @@ const formatCrypto = ({ marketData, newsData, sentimentData }) => {
         // For now preserving original logic which returns a failure message on catch, 
         // but here we might have partial data. 
         // If truly nothing:
-        return "【💰 币圈数据暂时获取失败...】";
+        return "【💰 行情数据暂时获取失败...】";
     }
 
     return message;
