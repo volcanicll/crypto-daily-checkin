@@ -1,4 +1,5 @@
 const { BASE_URL } = require("../../../config/constants");
+const { env } = require("../../../config/env");
 
 // 微信群机器人文本消息限制 2048 字节，预留一些空间
 const MAX_MESSAGE_BYTES = 1800;
@@ -95,10 +96,8 @@ class GroupBotService {
    * @returns {Promise<object>}
    */
   async sendSingleMessage(config) {
-    const { BOT_KEY } = process.env;
-    
     const response = await fetch(
-      `${this.baseUrl}/cgi-bin/webhook/send?key=${BOT_KEY}`,
+      `${this.baseUrl}/cgi-bin/webhook/send?key=${env.wxBot.key}`,
       {
         method: "POST",
         headers: {

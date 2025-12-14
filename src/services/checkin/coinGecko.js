@@ -1,5 +1,6 @@
 const { BASE_URL } = require("../../config/constants");
 const { MOBILE_HEADERS } = require("../../config/headers");
+const { env } = require("../../config/env");
 const HttpClient = require("../../utils/http");
 
 class CoinGeckoService {
@@ -8,17 +9,17 @@ class CoinGeckoService {
   }
 
   async checkIn() {
-    const { COINGECKO_COOKIE } = process.env;
+    const { cookie } = env.coinGecko;
 
     try {
       // 获取 CSRF Token
-      const { token } = await this.getAuthToken(COINGECKO_COOKIE);
+      const { token } = await this.getAuthToken(cookie);
       if (!token) {
         throw new Error("Failed to get CSRF token");
       }
 
       // 执行签到
-      await this.performCheckIn(COINGECKO_COOKIE, token);
+      await this.performCheckIn(cookie, token);
       console.log("CoinGecko：签到成功");
       return true;
     } catch (error) {

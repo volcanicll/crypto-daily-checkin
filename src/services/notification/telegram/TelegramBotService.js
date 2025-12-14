@@ -1,10 +1,11 @@
 const HttpClient = require('../../../utils/http');
+const { env } = require('../../../config/env');
 const http = new HttpClient();
 
 class TelegramBotService {
     constructor() {
-        this.token = process.env.TELEGRAM_BOT_TOKEN;
-        this.chatId = process.env.TELEGRAM_CHAT_ID;
+        this.token = env.telegram.botToken;
+        this.chatId = env.telegram.chatId;
         this.apiUrl = `https://api.telegram.org/bot${this.token}`;
     }
 

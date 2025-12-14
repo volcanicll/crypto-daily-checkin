@@ -35,7 +35,7 @@ async function run() {
 
     await Promise.all([
       // wxBotService.sendMessage(messageConfig),
-      groupBotService.sendMessage(messageConfig),
+      // groupBotService.sendMessage(messageConfig),
       telegramBotService.sendMessage(messageContent),
     ]);
 

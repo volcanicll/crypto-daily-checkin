@@ -1,4 +1,5 @@
 const { BASE_URL } = require("../../../config/constants");
+const { env } = require("../../../config/env");
 
 class WxBotService {
   constructor() {
@@ -25,9 +26,9 @@ class WxBotService {
   }
 
   async getToken() {
-    const { WX_COMPANY_ID, WX_APP_SECRET } = process.env;
+    const { companyId, appSecret } = env.wxApp;
     const response = await fetch(
-      `${this.baseUrl}/cgi-bin/gettoken?corpid=${WX_COMPANY_ID}&corpsecret=${WX_APP_SECRET}`,
+      `${this.baseUrl}/cgi-bin/gettoken?corpid=${companyId}&corpsecret=${appSecret}`,
       {
         method: "GET",
         headers: {
@@ -54,10 +55,10 @@ class WxBotService {
   }
 
   createMessageConfig(config) {
-    const { WX_APP_ID } = process.env;
+    const { appId } = env.wxApp;
     return {
       msgtype: "text",
-      agentid: WX_APP_ID,
+      agentid: appId,
       ...config,
     };
   }

@@ -1,0 +1,92 @@
+/**
+ * 环境变量集中管理
+ * 所有环境变量在这里统一加载和导出，便于管理和维护
+ */
+
+// 加载 dotenv（如果项目需要）
+require('dotenv').config();
+
+/**
+ * 环境变量配置
+ * 按功能模块分组，便于查找和管理
+ */
+const env = {
+  // CoinGecko 签到配置
+  coinGecko: {
+    cookie: process.env.COINGECKO_COOKIE || '',
+    token: process.env.COINGECKO_TOKEN || '',
+  },
+
+  // CoinMarketCap 签到配置
+  coinMarket: {
+    cookie: process.env.COINMARKET_COOKIE || '',
+    token: process.env.COINMARKET_TOKEN || '',
+  },
+
+  // 企业微信应用配置
+  wxApp: {
+    companyId: process.env.WX_COMPANY_ID || '',
+    appId: process.env.WX_APP_ID || '',
+    appSecret: process.env.WX_APP_SECRET || '',
+  },
+
+  // 企业微信群机器人配置
+  wxBot: {
+    key: process.env.BOT_KEY || '',
+  },
+
+  // Telegram Bot 配置
+  telegram: {
+    botToken: process.env.TELEGRAM_BOT_TOKEN || '',
+    chatId: process.env.TELEGRAM_CHAT_ID || '',
+  },
+};
+
+/**
+ * 验证必需的环境变量是否已配置
+ * @param {string[]} requiredKeys - 需要验证的环境变量路径，如 ['telegram.botToken', 'wxBot.key']
+ * @returns {{ valid: boolean, missing: string[] }}
+ */
+function validateEnv(requiredKeys = []) {
+  const missing = [];
+
+  for (const key of requiredKeys) {
+    const keys = key.split('.');
+    let value = env;
+    for (const k of keys) {
+      value = value?.[k];
+    }
+    if (!value) {
+      missing.push(key);
+    }
+  }
+
+  return {
+    valid: missing.length === 0,
+    missing,
+  };
+}
+
+/**
+ * 获取环境变量值，支持点号路径访问
+ * @param {string} path - 环境变量路径，如 'telegram.botToken'
+ * @param {*} defaultValue - 默认值
+ * @returns {*}
+ */
+function getEnv(path, defaultValue = '') {
+  const keys = path.split('.');
+  let value = env;
+  for (const k of keys) {
+    value = value?.[k];
+    if (value === undefined) {
+      return defaultValue;
+    }
+  }
+  return value || defaultValue;
+}
+
+module.exports = {
+  env,
+  validateEnv,
+  getEnv,
+};

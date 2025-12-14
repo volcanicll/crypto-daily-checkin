@@ -1,5 +1,6 @@
 const { BASE_URL } = require("../../config/constants");
 const { DESKTOP_HEADERS, DEVICE_INFO } = require("../../config/headers");
+const { env } = require("../../config/env");
 const HttpClient = require("../../utils/http");
 
 class CoinMarketService {
@@ -8,17 +9,14 @@ class CoinMarketService {
   }
 
   async checkIn() {
-    const { COINMARKET_COOKIE, COINMARKET_TOKEN } = process.env;
+    const { cookie, token } = env.coinMarket;
 
     try {
       // 检查签到资格
-      await this.checkEligibility(COINMARKET_COOKIE, COINMARKET_TOKEN);
+      await this.checkEligibility(cookie, token);
 
       // 执行签到
-      const result = await this.performCheckIn(
-        COINMARKET_COOKIE,
-        COINMARKET_TOKEN
-      );
+      const result = await this.performCheckIn(cookie, token);
 
       if (this.isCheckInSuccessful(result)) {
         console.log("CoinMarket：签到成功");
