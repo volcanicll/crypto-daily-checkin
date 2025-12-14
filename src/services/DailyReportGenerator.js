@@ -5,12 +5,14 @@ const { getCryptoNews } = require("./crypto/news");
 const { getGoldPrice } = require("./finance/gold");
 const { getAINews } = require("./tech/aiNews");
 const { getFearAndGreedIndex } = require("./crypto/sentiment");
+const llmService = require("./llm/LLMService");
 
 const { formatWeather } = require("../utils/formatters/WeatherFormatter");
 const { formatQuote } = require("../utils/formatters/QuoteFormatter");
 const { formatCrypto } = require("../utils/formatters/CryptoFormatter");
 const { formatGold } = require("../utils/formatters/GoldFormatter");
 const { formatAiNews } = require("../utils/formatters/AiNewsFormatter");
+const { formatCommentary } = require("../utils/formatters/CommentaryFormatter");
 const { GREETINGS } = require("../config/constants");
 
 class DailyReportGenerator {
@@ -47,25 +49,28 @@ class DailyReportGenerator {
      */
     async generateDailyMessage(city) {
         try {
-            // Order: Gold -> Weather -> Crypto -> AI News -> Love Words
+            // Order: Gold -> Crypto -> AI News -> LLM Commentary
 
             // Fetch data in parallel
             const [goldData, cryptoData, aiNews] = await Promise.all([
                 getGoldPrice().catch(e => { console.error("Gold fetch error", e); return null; }),
                 this.getCryptoReportSource(), // Handles its own errors
                 getAINews().catch(e => { console.error("AI News fetch error", e); return []; }),
-                // weatherService.getWeather(city), // Disabled as per request
-                // quoteService.getDailyQuote() // Disabled as per request
             ]);
 
-            // const weatherData = await weatherService.getWeather(city).catch(e => { console.error("Weather fetch error", e); return null; });
+            // Generate LLM commentary based on collected data
+            console.log("正在生成 AI 锐评...");
+            const commentary = await llmService.generateCommentary({
+                goldData,
+                cryptoData,
+                aiNews,
+            });
 
             const formattedParts = [
                 formatGold(goldData),
-                // formatWeather(weatherData, city), // Disabled
                 formatCrypto(cryptoData),
                 formatAiNews(aiNews),
-                // formatQuote(quote) // Disabled
+                formatCommentary(commentary),
             ];
 
             // Filter out empty strings
@@ -83,3 +88,4 @@ class DailyReportGenerator {
 }
 
 module.exports = new DailyReportGenerator();
+

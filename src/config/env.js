@@ -40,6 +40,13 @@ const env = {
     botToken: process.env.TELEGRAM_BOT_TOKEN || '',
     chatId: process.env.TELEGRAM_CHAT_ID || '',
   },
+
+  // LLM 锐评配置 (OpenRouter / OpenAI 兼容格式)
+  llm: {
+    apiKey: process.env.LLM_API_KEY || '',
+    baseUrl: process.env.LLM_BASE_URL || 'https://openrouter.ai/api/v1',
+    model: process.env.LLM_MODEL || 'openai/gpt-4o-mini',
+  },
 };
 
 /**
