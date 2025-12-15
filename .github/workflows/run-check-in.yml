@@ -17,6 +17,11 @@ jobs:
       WX_APP_ID: ${{secrets.WX_APP_ID}}
       WX_APP_SECRET: ${{secrets.WX_APP_SECRET}}
       BOT_KEY: ${{secrets.BOT_KEY}}
+      TELEGRAM_BOT_TOKEN: ${{secrets.TELEGRAM_BOT_TOKEN}}
+      TELEGRAM_CHAT_ID: ${{secrets.TELEGRAM_CHAT_ID}}
+      LLM_API_KEY=: ${{secrets.LLM_API_KEY}}
+      LLM_BASE_URL: ${{secrets.LLM_BASE_URL}}
+      LLM_MODEL: ${{secrets.LLM_MODEL}}
     steps:
       - name: checkout
         uses: actions/checkout@v4
