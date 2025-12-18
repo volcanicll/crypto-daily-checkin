@@ -41,6 +41,12 @@ const env = {
     chatId: process.env.TELEGRAM_CHAT_ID || '',
   },
 
+  // 钉钉群机器人配置（加签方式）
+  dingTalk: {
+    accessToken: process.env.DINGTALK_ACCESS_TOKEN || '',
+    secret: process.env.DINGTALK_SECRET || '',
+  },
+
   // LLM 锐评配置 (OpenRouter / OpenAI 兼容格式)
   llm: {
     apiKey: process.env.LLM_API_KEY || '',

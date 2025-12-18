@@ -1,5 +1,6 @@
 const BASE_URL = {
   WEIXIN: "https://qyapi.weixin.qq.com",
+  DINGTALK: "https://oapi.dingtalk.com",
   COINGECKO: "https://www.coingecko.com",
   COINMARKET: "https://api.coinmarketcap.com",
   // 免费天气API

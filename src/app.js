@@ -3,12 +3,13 @@ const coinMarketService = require("./services/checkin/coinMarket");
 const wxBotService = require("./services/notification/wxBot/WxBotService");
 const groupBotService = require("./services/notification/groupBot/GroupBotService");
 const telegramBotService = require("./services/notification/telegram/TelegramBotService");
+const dingTalkBotService = require("./services/notification/dingtalk/DingTalkBotService");
 const { getCurrentDayOfWeek } = require("./utils/date");
 const { formatCheckInResult } = require("./utils/message");
 const dailyReportGenerator = require("./services/DailyReportGenerator");
 
 async function run() {
-  console.log("开始执行自动签到...");
+  console.log("开始执行日报内容生成...");
 
   try {
     // 执行签到
@@ -18,24 +19,17 @@ async function run() {
     // };
 
     // 准备消息内容
-    // const checkInResultText = formatCheckInResult(checkInResults);
-    const dayOfWeek = getCurrentDayOfWeek();
+    const dailyMessage = await dailyReportGenerator.generateDailyMessage();
 
-    // 获取天气和情话内容，设置城市为重庆
-    const dailyMessage = await dailyReportGenerator.generateDailyMessage("重庆");
-
-    // 组合所有内容
-    const messageContent = `${dailyMessage}\n\n${dayOfWeek}了`;
-
-    // 发送通知
-    const messageConfig = {
-      msgtype: "text",
-      text: { content: messageContent },
-    };
+    const messageContent = `${dailyMessage}\n`;
 
     await Promise.all([
-      // wxBotService.sendMessage(messageConfig),
-      // groupBotService.sendMessage(messageConfig),
+      // wxBotService.sendMessage({
+      //   msgtype: "text",
+      //   text: { content: messageContent },
+      // }),
+      // groupBotService.sendMarkdown(messageContent),
+      dingTalkBotService.sendMarkdown("每日播报", messageContent),
       telegramBotService.sendMessage(messageContent),
     ]);
 
