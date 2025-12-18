@@ -19,9 +19,22 @@ jobs:
       BOT_KEY: ${{secrets.BOT_KEY}}
       TELEGRAM_BOT_TOKEN: ${{secrets.TELEGRAM_BOT_TOKEN}}
       TELEGRAM_CHAT_ID: ${{secrets.TELEGRAM_CHAT_ID}}
-      LLM_API_KEY=: ${{secrets.LLM_API_KEY}}
+      LLM_API_KEY: ${{secrets.LLM_API_KEY}}
       LLM_BASE_URL: ${{secrets.LLM_BASE_URL}}
       LLM_MODEL: ${{secrets.LLM_MODEL}}
+      DINGTALK_SECRET: ${{secrets.DINGTALK_SECRET}}
+      DINGTALK_ACCESS_TOKEN: ${{secrets.DINGTALK_ACCESS_TOKEN}}
+      MODULE_GOLD: ${{secrets.MODULE_GOLD}}
+      MODULE_CRYPTO: ${{secrets.MODULE_CRYPTO}}
+      MODULE_AI_NEWS: ${{secrets.MODULE_AI_NEWS}}
+      MODULE_LLM_COMMENTARY: ${{secrets.MODULE_LLM_COMMENTARY}}
+      MODULE_WEATHER: ${{secrets.MODULE_WEATHER}}
+      MODULE_QUOTE: ${{secrets.MODULE_QUOTE}}
+      NOTIFY_TELEGRAM: ${{secrets.NOTIFY_TELEGRAM}}
+      NOTIFY_DINGTALK: ${{secrets.NOTIFY_DINGTALK}}
+      NOTIFY_WX_BOT: ${{secrets.NOTIFY_WX_BOT}}
+      NOTIFY_WX_APP: ${{secrets.NOTIFY_WX_APP}}
+
     steps:
       - name: checkout
         uses: actions/checkout@v4

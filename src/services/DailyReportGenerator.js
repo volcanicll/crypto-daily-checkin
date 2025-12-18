@@ -1,5 +1,3 @@
-const weatherService = require("./lifestyle/WeatherService");
-const quoteService = require("./lifestyle/QuoteService");
 const { getMarketData } = require("./crypto/market");
 const { getCryptoNews } = require("./crypto/news");
 const { getGoldPrice } = require("./finance/gold");
@@ -7,24 +5,13 @@ const { getAINews } = require("./tech/aiNews");
 const { getFearAndGreedIndex } = require("./crypto/sentiment");
 const llmService = require("./llm/LLMService");
 
-const { formatWeather } = require("../utils/formatters/WeatherFormatter");
-const { formatQuote } = require("../utils/formatters/QuoteFormatter");
 const { formatCrypto } = require("../utils/formatters/CryptoFormatter");
 const { formatGold } = require("../utils/formatters/GoldFormatter");
 const { formatAiNews } = require("../utils/formatters/AiNewsFormatter");
 const { formatCommentary } = require("../utils/formatters/CommentaryFormatter");
-const { GREETINGS } = require("../config/constants");
+const { contentModules } = require("../config/modules");
 
 class DailyReportGenerator {
-  /**
-   * Get random greeting
-   * @returns {string}
-   */
-  getRandomGreeting() {
-    const randomIndex = Math.floor(Math.random() * GREETINGS.size);
-    return GREETINGS.get(randomIndex);
-  }
-
   /**
    * Encapsulate Crypto info fetching
    */
@@ -43,44 +30,92 @@ class DailyReportGenerator {
   }
 
   /**
-   * Generate the full daily message
+   * Generate the full daily message based on enabled modules
    * @returns {Promise<string>}
    */
   async generateDailyMessage() {
     try {
-      // Order: Gold -> Crypto -> AI News -> LLM Commentary
-      const [goldData, cryptoData, aiNews] = await Promise.all([
-        getGoldPrice().catch((e) => {
+      console.log(
+        "启用的内容模块:",
+        Object.entries(contentModules)
+          .filter(([, v]) => v)
+          .map(([k]) => k)
+          .join(", ")
+      );
+
+      // 并行获取所有启用模块的数据
+      const dataPromises = {};
+
+      if (contentModules.gold) {
+        dataPromises.gold = getGoldPrice().catch((e) => {
           console.error("Gold fetch error", e);
           return null;
-        }),
-        this.getCryptoReportSource(),
-        getAINews().catch((e) => {
+        });
+      }
+
+      if (contentModules.crypto) {
+        dataPromises.crypto = this.getCryptoReportSource();
+      }
+
+      if (contentModules.aiNews) {
+        dataPromises.aiNews = getAINews().catch((e) => {
           console.error("AI News fetch error", e);
           return [];
-        }),
-      ]);
+        });
+      }
 
-      console.log("正在生成 AI 锐评...");
-      const commentary = await llmService.generateCommentary({
-        goldData,
-        cryptoData,
-        aiNews,
-      });
+      // 等待所有数据获取完成
+      const keys = Object.keys(dataPromises);
+      const values = await Promise.all(Object.values(dataPromises));
+      const data = keys.reduce((acc, key, i) => {
+        acc[key] = values[i];
+        return acc;
+      }, {});
 
-      const formattedParts = [
-        formatGold(goldData),
-        formatCrypto(cryptoData),
-        formatAiNews(aiNews),
-        formatCommentary(commentary),
-      ];
+      // LLM 锐评需要其他模块数据，单独处理
+      let commentary = null;
+      if (contentModules.llmCommentary) {
+        console.log("正在生成 AI 锐评...");
+        commentary = await llmService.generateCommentary({
+          goldData: data.gold || null,
+          cryptoData: data.crypto || {
+            marketData: [],
+            newsData: [],
+            sentimentData: null,
+          },
+          aiNews: data.aiNews || [],
+        });
+      }
+
+      // 按配置顺序格式化内容
+      const formattedParts = [];
+
+      if (contentModules.gold && data.gold) {
+        formattedParts.push(formatGold(data.gold));
+      }
+
+      if (contentModules.crypto && data.crypto) {
+        formattedParts.push(formatCrypto(data.crypto));
+      }
+
+      if (contentModules.aiNews && data.aiNews) {
+        formattedParts.push(formatAiNews(data.aiNews));
+      }
+
+      if (contentModules.llmCommentary && commentary) {
+        formattedParts.push(formatCommentary(commentary));
+      }
 
       // Filter out empty strings
       const validParts = formattedParts.filter(
         (part) => part && part.trim() !== ""
       );
 
-      const message = `${validParts.join("\n\n")}`;
+      if (validParts.length === 0) {
+        return "暂无内容 📭";
+      }
+
+      const message = validParts.join("\n\n");
       console.log("Generated Message Preview:\n", message);
       return message;
     } catch (error) {
