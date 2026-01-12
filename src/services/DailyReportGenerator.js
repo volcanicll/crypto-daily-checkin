@@ -2,13 +2,22 @@ const { getMarketData } = require("./crypto/market");
 const { getCryptoNews } = require("./crypto/news");
 const { getGoldPrice } = require("./finance/gold");
 const { getAINews } = require("./tech/aiNews");
+const { getAgentCodeNews } = require("./tech/agentCodeNews");
 const { getFearAndGreedIndex } = require("./crypto/sentiment");
 const llmService = require("./llm/LLMService");
 
 const { formatCrypto } = require("../utils/formatters/CryptoFormatter");
 const { formatGold } = require("../utils/formatters/GoldFormatter");
 const { formatAiNews } = require("../utils/formatters/AiNewsFormatter");
+const { formatAgentCode } = require("../utils/formatters/AgentCodeFormatter");
 const { formatCommentary } = require("../utils/formatters/CommentaryFormatter");
+const {
+  formatAiRecommendations,
+} = require("../utils/formatters/AiRecommendationsFormatter");
+const {
+  messageHeader,
+  divider,
+} = require("../utils/formatters/DingTalkMarkdownUtils");
 const { contentModules } = require("../config/modules");
 
 class DailyReportGenerator {
@@ -64,6 +73,13 @@ class DailyReportGenerator {
         });
       }
 
+      if (contentModules.agentCode) {
+        dataPromises.agentCode = getAgentCodeNews().catch((e) => {
+          console.error("Agent Code News fetch error", e);
+          return [];
+        });
+      }
+
       // 等待所有数据获取完成
       const keys = Object.keys(dataPromises);
       const values = await Promise.all(Object.values(dataPromises));
@@ -102,6 +118,27 @@ class DailyReportGenerator {
         formattedParts.push(formatAiNews(data.aiNews));
       }
 
+      if (contentModules.agentCode && data.agentCode) {
+        formattedParts.push(formatAgentCode(data.agentCode));
+      }
+
+      // AI 精选推荐：合并所有资讯，让 AI 筛选最有价值的
+      let aiRecommendations = null;
+      if (contentModules.aiRecommendations) {
+        const allNews = [...(data.aiNews || []), ...(data.agentCode || [])];
+        if (allNews.length > 0) {
+          console.log("正在生成 AI 精选推荐...");
+          aiRecommendations = await llmService.generateRecommendations(
+            allNews,
+            6
+          );
+        }
+      }
+
+      if (aiRecommendations && aiRecommendations.length > 0) {
+        formattedParts.push(formatAiRecommendations(aiRecommendations));
+      }
+
       if (contentModules.llmCommentary && commentary) {
         formattedParts.push(formatCommentary(commentary));
       }
@@ -115,7 +152,10 @@ class DailyReportGenerator {
         return "暂无内容 📭";
       }
 
-      const message = validParts.join("\n\n");
+      // 添加消息头和分隔线
+      const header = messageHeader();
+      const separator = divider();
+      const message = header + separator + validParts.join(separator);
       console.log("Generated Message Preview:\n", message);
       return message;
     } catch (error) {

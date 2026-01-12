@@ -22,11 +22,13 @@
 
 - **加密货币新闻**：CryptoCompare / Coinpaprika
 - **AI 行业资讯**：TechCrunch, VentureBeat, MIT Tech Review (RSS Feed)
+- **Agent Code 前沿**：GitHub Blog, Anthropic, OpenAI, Reddit, Lobste.rs, Hacker News, GitHub Trending
 - **自动翻译**：所有英文内容自动翻译为中文
 
-### 🤖 AI 锐评
+### 🤖 AI 智能功能
 
-基于 LLM (OpenRouter/OpenAI 兼容) 对当日市场数据和资讯进行智能点评分析。
+- **AI 锐评**：基于 LLM 对当日市场数据和资讯进行智能点评分析
+- **AI 精选推荐**：从所有资讯中智能筛选最有价值的内容，并给出推荐理由
 
 ### 📤 多渠道推送
 
@@ -94,14 +96,20 @@ src/
 │   ├── DailyReportGenerator.js  # 日报生成器
 │   ├── crypto/            # 加密货币服务 (行情、新闻、情绪)
 │   ├── finance/           # 金融服务 (金价)
-│   ├── tech/              # 科技资讯服务 (AI News)
-│   ├── llm/               # LLM 锐评服务
+│   ├── tech/              # 科技资讯服务
+│   │   ├── aiNews.js      # AI 行业资讯
+│   │   └── agentCodeNews.js  # Agent Code 前沿资讯
+│   ├── llm/               # LLM 服务 (锐评 + AI 推荐)
 │   └── notification/      # 通知服务
 │       ├── telegram/      # Telegram Bot
 │       ├── dingtalk/      # 钉钉群机器人
 │       ├── groupBot/      # 企业微信群机器人
 │       └── wxBot/         # 企业微信应用消息
-└── utils/                 # 工具函数
+└── utils/
+    └── formatters/        # 格式化工具
+        ├── DingTalkMarkdownUtils.js
+        ├── AiRecommendationsFormatter.js
+        └── ...              # 其他格式化器
 ```
 
 ---
@@ -165,39 +173,55 @@ src/
 
 通过环境变量灵活控制启用/禁用各功能模块：
 
-| 变量                    | 默认  | 说明          |
-| ----------------------- | ----- | ------------- |
-| `MODULE_GOLD`           | true  | 贵金属行情    |
-| `MODULE_CRYPTO`         | true  | 加密货币行情  |
-| `MODULE_AI_NEWS`        | true  | AI 科技资讯   |
-| `MODULE_LLM_COMMENTARY` | true  | LLM 智能锐评  |
-| `MODULE_WEATHER`        | false | 天气预报      |
-| `MODULE_QUOTE`          | false | 每日一言/情话 |
+| 变量                        | 默认  | 说明                |
+| --------------------------- | ----- | ------------------- |
+| `MODULE_GOLD`               | true  | 贵金属行情          |
+| `MODULE_CRYPTO`             | true  | 加密货币行情        |
+| `MODULE_AI_NEWS`            | true  | AI 科技资讯         |
+| `MODULE_AGENT_CODE`         | true  | Agent Code 前沿资讯 |
+| `MODULE_AI_RECOMMENDATIONS` | true  | AI 精选推荐         |
+| `MODULE_LLM_COMMENTARY`     | true  | LLM 智能锐评        |
+| `MODULE_WEATHER`            | false | 天气预报            |
+| `MODULE_QUOTE`              | false | 每日一言/情话       |
 
 ---
 
 ## 📝 示例输出
 
 ```
-💰 今日贵金属 (12月18日)
-━━━━━━━━━━━━━━━━
-黄金 Au: ¥625.00/g (↑0.32%)
-白银 Ag: ¥7.85/g (↓0.13%)
+# � 每日播报
 
-📈 加密货币行情
-━━━━━━━━━━━━━━━━
-BTC: $105,000 (↑2.35%)
-ETH: $3,950 (↑1.28%)
-...
+_1月12日 周日_
 
-🤖 AI 行业快讯
-━━━━━━━━━━━━━━━━
-• OpenAI 发布最新模型...
-• Google DeepMind 突破...
+---
 
-💡 AI 锐评
-━━━━━━━━━━━━━━━━
-今日 BTC 突破历史新高...
+## 🏆 今日金价
+📈 **沪金主力**: ¥625.50/g (+0.35%)
+
+---
+
+## 💰 加密行情
+🔥 **恐慌贪婪指数**: 72 (贪婪)
+📈 **BTC**: $98,500.00 (+2.35%)
+
+---
+
+## �‍💻 Agent Code 前沿
+
+1. **[GitHub Copilot 推出 Agent 模式](https://...)**
+   _📢 GitHub Blog · 2h ago_
+
+---
+
+## ⭐ AI 精选推荐
+
+1. **[Claude 3.5 Sonnet 发布](https://...)**
+   _Anthropic_ · 💡 编码能力大幅提升
+
+---
+
+## 🎯 AI 锐评
+> 今日市场情绪偏向贪婪...
 ```
 
 ---

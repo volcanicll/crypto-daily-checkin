@@ -1,5 +1,47 @@
 # 更新日志
 
+## [2026-01-12] 功能更新
+
+### 新增功能
+
+- **Agent Code 前沿资讯模块**
+
+  - 聚合 GitHub Blog、Anthropic、OpenAI 官方博客
+  - 抓取 GitHub Trending 热门 AI/ML 开源项目
+  - 社区讨论：Reddit r/LocalLLaMA、r/MachineLearning、Lobste.rs、Hacker News
+  - 开发者资讯：Dev.to AI、Echo JS
+  - 智能关键词过滤（agent, copilot, cursor, vibe coding 等）
+
+- **AI 精选推荐模块**
+  - 收集所有资讯后发送给 LLM 进行价值评估
+  - AI 从全部内容中筛选最有价值的 6 条
+  - 每条推荐附带 AI 给出的推荐理由
+  - 解决了简单限制来源条数可能遗漏重要消息的问题
+
+### 优化
+
+- **钉钉 Markdown 排版优化**
+
+  - 新增 `DingTalkMarkdownUtils.js` 格式化工具类
+  - 统一的模块标题格式 `## 🏆 标题`
+  - 使用分隔线 `---` 优化视觉层级
+  - 价格信息使用粗体高亮
+  - 引用块格式化 AI 锐评
+
+- **消息格式重构**
+  - 各 Formatter 使用统一的格式化工具
+  - 添加消息头部日期显示
+  - 优化链接列表排版
+
+### 新增环境变量
+
+| 变量                        | 默认 | 说明                |
+| --------------------------- | ---- | ------------------- |
+| `MODULE_AGENT_CODE`         | true | Agent Code 前沿资讯 |
+| `MODULE_AI_RECOMMENDATIONS` | true | AI 精选推荐         |
+
+---
+
 ## [2025-12-18] 功能更新
 
 ### 新增功能

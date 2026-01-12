@@ -17,6 +17,12 @@ const contentModules = {
   // AI 资讯模块 (默认启用)
   aiNews: process.env.MODULE_AI_NEWS !== "false",
 
+  // Agent Code 资讯模块 (默认启用)
+  agentCode: process.env.MODULE_AGENT_CODE !== "false",
+
+  // AI 精选推荐模块 (默认启用)
+  aiRecommendations: process.env.MODULE_AI_RECOMMENDATIONS !== "false",
+
   // LLM 锐评模块 (默认启用)
   llmCommentary: process.env.MODULE_LLM_COMMENTARY !== "false",
 

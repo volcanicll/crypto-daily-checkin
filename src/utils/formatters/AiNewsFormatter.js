@@ -1,17 +1,20 @@
+const { sectionHeader, linkItem } = require("./DingTalkMarkdownUtils");
+
 /**
  * Format AI news data
- * @param {Array} aiNews 
+ * @param {Array} aiNews
  * @returns {string} Formatted AI news report
  */
 const formatAiNews = (aiNews) => {
-    if (!aiNews || aiNews.length === 0) return "";
+  if (!aiNews || aiNews.length === 0) return "";
 
-    let message = "【🤖 AI 前沿资讯 🤖】\n";
-    aiNews.forEach((news, index) => {
-        message += `${index + 1}. [${news.title}](${news.url})\n`;
-    });
+  let message = sectionHeader("🤖", "AI 前沿资讯");
 
-    return message;
+  aiNews.slice(0, 10).forEach((news, index) => {
+    message += linkItem(index + 1, news.title, news.url, news.author);
+  });
+
+  return message;
 };
 
 module.exports = { formatAiNews };
