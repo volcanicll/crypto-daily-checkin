@@ -1,6 +1,6 @@
 const {
   sectionHeader,
-  agentCodeLinkItem,
+  linkItem,
   formatRelativeTime,
 } = require("./DingTalkMarkdownUtils");
 
@@ -13,6 +13,7 @@ const CATEGORY_LABELS = {
   community: "💬",
   devtools: "🔧",
   newsletter: "📰",
+  twitter: "📌",
 };
 
 /**
@@ -29,15 +30,9 @@ const formatAgentCode = (agentCodeNews) => {
   agentCodeNews.slice(0, 8).forEach((news, index) => {
     const relativeTime = formatRelativeTime(news.posted_on);
     const categoryIcon = CATEGORY_LABELS[news.category] || "📌";
-    const sourceName = `${categoryIcon} ${news.source}`;
+    const sourceName = `${categoryIcon} ${news.source} · ${relativeTime}`;
 
-    message += agentCodeLinkItem(
-      index + 1,
-      news.title,
-      news.url,
-      sourceName,
-      relativeTime
-    );
+    message += linkItem(index + 1, news.title, news.url, sourceName);
   });
 
   return message;

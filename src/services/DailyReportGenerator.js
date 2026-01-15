@@ -3,6 +3,7 @@ const { getCryptoNews } = require("./crypto/news");
 const { getGoldPrice } = require("./finance/gold");
 const { getAINews } = require("./tech/aiNews");
 const { getAgentCodeNews } = require("./tech/agentCodeNews");
+const { getXTwitterNews } = require("./tech/xTwitterNews");
 const { getFearAndGreedIndex } = require("./crypto/sentiment");
 const llmService = require("./llm/LLMService");
 
@@ -10,6 +11,7 @@ const { formatCrypto } = require("../utils/formatters/CryptoFormatter");
 const { formatGold } = require("../utils/formatters/GoldFormatter");
 const { formatAiNews } = require("../utils/formatters/AiNewsFormatter");
 const { formatAgentCode } = require("../utils/formatters/AgentCodeFormatter");
+const { formatXTwitter } = require("../utils/formatters/XTwitterFormatter");
 const { formatCommentary } = require("../utils/formatters/CommentaryFormatter");
 const {
   formatAiRecommendations,
@@ -80,6 +82,13 @@ class DailyReportGenerator {
         });
       }
 
+      if (contentModules.xTwitter) {
+        dataPromises.xTwitter = getXTwitterNews().catch((e) => {
+          console.error("X/Twitter News fetch error", e);
+          return [];
+        });
+      }
+
       // 等待所有数据获取完成
       const keys = Object.keys(dataPromises);
       const values = await Promise.all(Object.values(dataPromises));
@@ -122,10 +131,18 @@ class DailyReportGenerator {
         formattedParts.push(formatAgentCode(data.agentCode));
       }
 
+      if (contentModules.xTwitter && data.xTwitter) {
+        formattedParts.push(formatXTwitter(data.xTwitter));
+      }
+
       // AI 精选推荐：合并所有资讯，让 AI 筛选最有价值的
       let aiRecommendations = null;
       if (contentModules.aiRecommendations) {
-        const allNews = [...(data.aiNews || []), ...(data.agentCode || [])];
+        const allNews = [
+          ...(data.aiNews || []),
+          ...(data.agentCode || []),
+          ...(data.xTwitter || []),
+        ];
         if (allNews.length > 0) {
           console.log("正在生成 AI 精选推荐...");
           aiRecommendations = await llmService.generateRecommendations(

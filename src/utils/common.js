@@ -37,20 +37,22 @@ async function fetchWithRetry(fetchFn, retries = 3) {
 }
 
 /**
- * Filter items to only include those from today
+ * Filter items by date range
  * @param {Array} items - Array of items with date field
  * @param {string} dateField - Name of the date field (default: 'posted_on')
- * @returns {Array} - Items from today only
+ * @param {number} daysRange - Number of days to include (default: 1 = today only)
+ * @returns {Array} - Items within the date range
  */
-function filterTodayItems(items, dateField = "posted_on") {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+function filterTodayItems(items, dateField = "posted_on", daysRange = 1) {
+  const now = new Date();
+  const startDate = new Date();
+  startDate.setDate(now.getDate() - daysRange + 1);
+  startDate.setHours(0, 0, 0, 0);
 
   return items.filter((item) => {
     try {
       const itemDate = new Date(item[dateField]);
-      itemDate.setHours(0, 0, 0, 0);
-      return itemDate.getTime() === today.getTime();
+      return itemDate >= startDate && itemDate <= now;
     } catch {
       return false;
     }

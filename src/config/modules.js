@@ -20,6 +20,9 @@ const contentModules = {
   // Agent Code 资讯模块 (默认启用)
   agentCode: process.env.MODULE_AGENT_CODE !== "false",
 
+  // X/Twitter 热门技术贴模块 (默认禁用，需配置 RAPID_API_KEY)
+  xTwitter: process.env.MODULE_X_TWITTER === "true",
+
   // AI 精选推荐模块 (默认启用)
   aiRecommendations: process.env.MODULE_AI_RECOMMENDATIONS !== "false",
 

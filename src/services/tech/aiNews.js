@@ -10,8 +10,8 @@ const AI_SOURCES = [
     isRss: true,
   },
   {
-    name: "VentureBeat AI",
-    url: "https://venturebeat.com/category/ai/feed/",
+    name: "Wired AI",
+    url: "https://www.wired.com/feed/tag/ai/latest/rss",
     isRss: true,
   },
   {

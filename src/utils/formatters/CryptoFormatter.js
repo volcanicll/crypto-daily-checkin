@@ -40,7 +40,6 @@ const formatCrypto = ({ marketData, newsData, sentimentData }) => {
       const changeStr = `${change > 0 ? "+" : ""}${change}%`;
       message += priceItem(icon, coin.symbol.toUpperCase(), price, changeStr);
     });
-    message += "\n";
   }
 
   // News Data with Links

@@ -22,7 +22,7 @@ const divider = () => {
 };
 
 /**
- * 生成价格条目
+ * 生成价格条目（每行独立显示）
  * @param {string} icon - 涨跌 emoji
  * @param {string} name - 品种名称
  * @param {string} price - 价格字符串
@@ -30,7 +30,7 @@ const divider = () => {
  * @returns {string}
  */
 const priceItem = (icon, name, price, change) => {
-  return `${icon} **${name}**: ${price} (${change})\n`;
+  return `${icon} **${name}**: ${price} (${change})\n\n`;
 };
 
 /**

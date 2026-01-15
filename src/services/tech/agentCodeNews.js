@@ -24,10 +24,10 @@ const RSS_SOURCES = [
     ],
   },
   {
-    name: "Anthropic",
-    url: "https://www.anthropic.com/rss.xml",
+    name: "The Verge AI",
+    url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
     category: "official",
-    keywords: ["claude", "code", "coding", "agent", "developer", "sonnet"],
+    keywords: ["claude", "code", "coding", "agent", "developer", "ai", "llm"],
   },
   {
     name: "OpenAI",
@@ -37,9 +37,9 @@ const RSS_SOURCES = [
   },
   // DeepLearning.AI
   {
-    name: "The Batch",
-    url: "https://read.deeplearning.ai/the-batch/rss/",
-    category: "newsletter",
+    name: "AI News HN",
+    url: "https://hnrss.org/newest?q=LLM+OR+GPT+OR+Claude&points=30",
+    category: "community",
     keywords: ["agent", "llm", "coding", "developer", "ai"],
   },
   // 社区讨论
@@ -100,10 +100,8 @@ const RSS_SOURCES = [
 ];
 
 /**
- * GitHub Trending API URL (unofficial)
+ * GitHub Trending - 直接抓取页面 (主要方案)
  */
-const GITHUB_TRENDING_API =
-  "https://api.gitterapp.com/repositories?since=daily&language=";
 
 /**
  * 检查标题是否包含相关关键词
@@ -179,66 +177,7 @@ async function fetchRSSSource(source) {
 }
 
 /**
- * 获取 GitHub Trending 项目 (AI/ML 相关)
- * @returns {Promise<Array>}
- */
-async function fetchGitHubTrending() {
-  const items = [];
-  const languages = ["python", "typescript", "javascript"];
-  const aiKeywords = [
-    "ai",
-    "agent",
-    "llm",
-    "gpt",
-    "copilot",
-    "code",
-    "assistant",
-    "chat",
-    "ml",
-    "deep",
-    "neural",
-    "transformer",
-  ];
-
-  for (const lang of languages) {
-    try {
-      console.log(`Fetching GitHub Trending (${lang})...`);
-
-      const repos = await http.get(`${GITHUB_TRENDING_API}${lang}`, {
-        responseType: "json",
-      });
-
-      if (Array.isArray(repos)) {
-        repos.slice(0, 10).forEach((repo) => {
-          const desc = (repo.description || "").toLowerCase();
-          const name = (repo.name || "").toLowerCase();
-
-          if (aiKeywords.some((kw) => desc.includes(kw) || name.includes(kw))) {
-            items.push({
-              title: `⭐ ${repo.name}: ${repo.description || "No description"}`,
-              url: repo.url || `https://github.com/${repo.author}/${repo.name}`,
-              source: "GitHub Trending",
-              category: "opensource",
-              posted_on: new Date().toISOString(),
-              stars: repo.stars || 0,
-            });
-          }
-        });
-      }
-    } catch (error) {
-      console.error(`Error fetching GitHub Trending (${lang}):`, error.message);
-    }
-  }
-
-  // 按星标排序，取前 3
-  return items
-    .sort((a, b) => (b.stars || 0) - (a.stars || 0))
-    .slice(0, 3)
-    .map(({ stars, ...rest }) => rest);
-}
-
-/**
- * 直接抓取 GitHub Trending 页面 (备用方案)
+ * 直接抓取 GitHub Trending 页面
  * @returns {Promise<Array>}
  */
 async function scrapeGitHubTrendingPage() {
@@ -310,11 +249,11 @@ async function getAgentCodeNews() {
   const rssResults = await Promise.all(rssPromises);
   rssResults.forEach((items) => allNews.push(...items));
 
-  // 尝试获取 GitHub Trending
-  let trendingItems = await fetchGitHubTrending();
-  if (trendingItems.length === 0) {
-    trendingItems = await scrapeGitHubTrendingPage();
-  }
+  // 获取 GitHub Trending (直接抓取页面)
+  const trendingItems = await scrapeGitHubTrendingPage().catch((e) => {
+    console.error("GitHub Trending scrape error:", e.message);
+    return [];
+  });
   allNews.push(...trendingItems);
 
   // 按时间排序（最新优先）
