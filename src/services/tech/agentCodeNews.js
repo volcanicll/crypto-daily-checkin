@@ -35,6 +35,12 @@ const RSS_SOURCES = [
     category: "official",
     keywords: ["gpt", "codex", "code", "agent", "developer", "api"],
   },
+  {
+    name: "Smol AI News",
+    url: "https://news.smol.ai/rss.xml",
+    category: "official",
+    keywords: ["ai", "agent", "llm", "code", "coding", "developer", "model"],
+  },
   // DeepLearning.AI
   {
     name: "AI News HN",
