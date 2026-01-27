@@ -10,7 +10,47 @@
  * @returns {string}
  */
 const sectionHeader = (icon, title) => {
-  return `## ${icon} ${title}\n`;
+  return `\n## ${icon} ${title}\n\n`;
+};
+
+/**
+ * 生成卡片式条目 (UI/UX Pro Max)
+ * @param {string} title - 标题
+ * @param {string} url - 链接
+ * @param {string} summary - 摘要/引文
+ * @param {string} source - 来源
+ * @param {string} time - 时间
+ * @returns {string}
+ */
+const cardItem = (title, url, summary, source, time) => {
+  // Clean title: remove newlines, brackets, and limit length efficiently
+  const cleanTitleStr = title.replace(/[\r\n]+/g, " ").replace(/[\[\]]/g, "");
+  const safeTitle =
+    cleanTitleStr.length > 50
+      ? cleanTitleStr.substring(0, 47) + "..."
+      : cleanTitleStr;
+
+  let item = `- **[${safeTitle}](${url})**\n`;
+
+  if (summary) {
+    // 使用引用块作为卡片内容背景
+    // 限制摘要长度, Remove newlines from summary to keep blockquote clean
+    const cleanSummaryText = summary.replace(/[\r\n]+/g, " ");
+    const cleanSummary =
+      cleanSummaryText.length > 100
+        ? cleanSummaryText.substring(0, 97) + "..."
+        : cleanSummaryText;
+    item += `> ${cleanSummary}\n`;
+  }
+
+  const metaParts = [source, time].filter(Boolean);
+  if (metaParts.length > 0) {
+    // Meta信息放在引用块内或紧接其后，这里放在引用块最后一行看起来更像卡片底部
+    // 使用斜体区分
+    item += `> *${metaParts.join(" · ")}*\n`;
+  }
+
+  return item + "\n";
 };
 
 /**
@@ -18,11 +58,21 @@ const sectionHeader = (icon, title) => {
  * @returns {string}
  */
 const divider = () => {
-  return "\n---\n\n";
+  return "\n\n---\n\n";
 };
 
 /**
- * 生成价格条目（每行独立显示）
+ * 生成带标签的信息行
+ * @param {string} label - 标签
+ * @param {string} value - 内容
+ * @returns {string}
+ */
+const infoRow = (label, value) => {
+  return `- **${label}**: ${value}\n`;
+};
+
+/**
+ * 生成价格条目（紧凑版）
  * @param {string} icon - 涨跌 emoji
  * @param {string} name - 品种名称
  * @param {string} price - 价格字符串
@@ -30,44 +80,54 @@ const divider = () => {
  * @returns {string}
  */
 const priceItem = (icon, name, price, change) => {
-  return `${icon} **${name}**: ${price} (${change})\n\n`;
+  return `> ${icon} **${name}**\n> ${price}  ${change}\n> \n`;
 };
 
 /**
- * 生成链接列表项
- * @param {number} index - 序号
+ * 生成链接列表项 (无序列表)
  * @param {string} title - 标题
  * @param {string} url - 链接
  * @param {string} [source] - 来源
  * @returns {string}
  */
-const linkItem = (index, title, url, source = null) => {
-  // 限制标题长度，避免过长
+const linkItem = (title, url, source = null) => {
+  // 限制标题长度
   const truncatedTitle =
     title.length > 50 ? title.substring(0, 47) + "..." : title;
-  let item = `${index}. [${truncatedTitle}](${url})`;
+
+  // 移除标题中可能破坏 Markdown 的字符
+  const safeTitle = truncatedTitle.replace(/[\[\]]/g, "");
+
+  let item = `- [${safeTitle}](${url})`;
   if (source) {
-    item += `\n   _${source}_`;
+    // 来源使用更小的字体感觉（虽然钉钉不支持小字体，但可以用斜体区分）
+    item += `  _${source}_`;
   }
   return item + "\n";
 };
 
 /**
  * 生成 Agent Code 风格的链接项（带加粗）
- * @param {number} index - 序号
  * @param {string} title - 标题
  * @param {string} url - 链接
  * @param {string} source - 来源
  * @param {string} [time] - 时间
  * @returns {string}
  */
-const agentCodeLinkItem = (index, title, url, source, time = null) => {
+const agentCodeLinkItem = (title, url, source, time = null) => {
   const truncatedTitle =
     title.length > 45 ? title.substring(0, 42) + "..." : title;
-  let item = `${index}. **[${truncatedTitle}](${url})**`;
-  if (source || time) {
-    const meta = [source, time].filter(Boolean).join(" · ");
-    item += `\n   _${meta}_`;
+
+  const safeTitle = truncatedTitle.replace(/[\[\]]/g, "");
+
+  let item = `- **[${safeTitle}](${url})**`;
+
+  const metaParts = [];
+  if (source) metaParts.push(source);
+  if (time) metaParts.push(time);
+
+  if (metaParts.length > 0) {
+    item += `\n  > ${metaParts.join(" · ")}`;
   }
   return item + "\n";
 };
@@ -85,14 +145,15 @@ const blockquote = (text) => {
 };
 
 /**
- * 生成简洁的价格表格（钉钉 Markdown 支持有限，使用紧凑格式）
+ * 生成价格表格（使用引用块模拟表格）
  * @param {Array<{symbol: string, price: string, change: string, icon: string}>} items
  * @returns {string}
  */
 const priceTable = (items) => {
   return items
     .map(
-      (item) => `${item.icon} **${item.symbol}** ${item.price} ${item.change}`
+      (item) =>
+        `> ${item.icon} **${item.symbol}** ${item.price} \`${item.change}\``,
     )
     .join("\n");
 };
@@ -131,13 +192,15 @@ const messageHeader = (title = "每日播报") => {
     day: "numeric",
     weekday: "short",
   });
-  return `# 📊 ${title}\n\n_${dateStr}_\n`;
+  return `# ${title}\n**${dateStr}**\n\n`;
 };
 
 module.exports = {
   sectionHeader,
   divider,
+  infoRow,
   priceItem,
+  cardItem,
   linkItem,
   agentCodeLinkItem,
   blockquote,

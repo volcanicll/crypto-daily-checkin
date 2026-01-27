@@ -1,6 +1,6 @@
 const {
   sectionHeader,
-  linkItem,
+  cardItem,
   formatRelativeTime,
 } = require("./DingTalkMarkdownUtils");
 
@@ -14,12 +14,18 @@ const formatAiNews = (aiNews) => {
 
   let message = sectionHeader("🤖", "AI 前沿资讯");
 
-  aiNews.slice(0, 10).forEach((news, index) => {
+  aiNews.slice(0, 10).forEach((news) => {
     const relativeTime = formatRelativeTime(news.posted_on);
-    const sourceName = news.author
-      ? `${news.author} · ${relativeTime}`
-      : relativeTime;
-    message += linkItem(index + 1, news.title, news.url, sourceName);
+    const sourceName = news.author || "";
+    const summary = news.description || "";
+
+    message += cardItem(
+      news.title,
+      news.url,
+      summary,
+      sourceName,
+      relativeTime,
+    );
   });
 
   return message;

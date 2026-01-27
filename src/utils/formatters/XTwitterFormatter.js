@@ -1,6 +1,7 @@
 const {
   sectionHeader,
   formatRelativeTime,
+  cardItem,
 } = require("./DingTalkMarkdownUtils");
 
 /**
@@ -37,22 +38,34 @@ const formatXTwitter = (xTwitterNews) => {
   let message = sectionHeader("𝕏", "X/Twitter 热门");
   message += "> _AI · Agent Code · 技术热帖_\n\n";
 
-  xTwitterNews.slice(0, 8).forEach((news, index) => {
+  xTwitterNews.slice(0, 8).forEach((news) => {
     const relativeTime = formatRelativeTime(news.posted_on);
     const engagementStr = formatEngagement(news.engagement);
 
-    // 截取标题
-    const title =
-      news.title.length > 60 ? news.title.substring(0, 57) + "..." : news.title;
+    // Logic for Title vs Summary
+    // Tweets are often just text. We should use a short excerpt as Title (link) and the rest as Summary.
+    let title = news.title;
+    let summary = null;
 
-    // 格式：序号 + 标题链接
-    message += `${index + 1}. [${title}](${news.url})\n`;
-    // 来源 + 时间 + 互动数据
-    message += `   _${news.source} · ${relativeTime}_`;
-    if (engagementStr) {
-      message += ` | ${engagementStr}`;
+    // Clean newlines in title for the link part
+    title = title.replace(/[\r\n]+/g, " ");
+
+    if (title.length > 40) {
+      summary = news.title; // Use full text as summary (can preserve newlines in logic, but cardItem cleans it)
+      title = title.substring(0, 40) + "..."; // Short title for the link
+    } else {
+      // Short tweet, no summary needed, just title link
+      summary = null;
     }
-    message += "\n\n";
+
+    // Use cardItem for consistency
+    message += cardItem(
+      title,
+      news.url,
+      summary,
+      news.source,
+      `${relativeTime}${engagementStr ? " | " + engagementStr : ""}`,
+    );
   });
 
   return message;

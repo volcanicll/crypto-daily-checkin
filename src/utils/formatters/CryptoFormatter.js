@@ -1,7 +1,9 @@
 const {
   sectionHeader,
   priceItem,
-  linkItem,
+  cardItem,
+  infoRow,
+  formatRelativeTime,
 } = require("./DingTalkMarkdownUtils");
 
 /**
@@ -23,9 +25,13 @@ const formatCrypto = ({ marketData, newsData, sentimentData }) => {
           ? "🔥"
           : "😊"
         : sentimentData.value <= 25
-        ? "😰"
-        : "😐";
-    message += `${sentimentIcon} **恐慌贪婪指数**: ${sentimentData.value} (${sentimentData.classification})\n\n`;
+          ? "😰"
+          : "😐";
+    message +=
+      infoRow(
+        "恐慌贪婪指数",
+        `${sentimentIcon} ${sentimentData.value} (${sentimentData.classification})`,
+      ) + "\n";
   }
 
   // Market Data
@@ -44,9 +50,15 @@ const formatCrypto = ({ marketData, newsData, sentimentData }) => {
 
   // News Data with Links
   if (newsData && newsData.length > 0) {
-    message += "**📰 最新资讯**\n\n";
-    newsData.slice(0, 10).forEach((news, index) => {
-      message += linkItem(index + 1, news.title, news.url);
+    message += "\n**📰 最新资讯**\n\n";
+    // Increase limit slightly as layout is more compact, or keep 10.
+    // Logic changed: linkItem no longer takes index.
+    newsData.slice(0, 10).forEach((news) => {
+      const relativeTime = formatRelativeTime(news.posted_on);
+      const summary = news.description || "";
+      const source = news.author || "CryptoNews";
+
+      message += cardItem(news.title, news.url, summary, source, relativeTime);
     });
   }
 

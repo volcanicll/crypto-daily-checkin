@@ -159,6 +159,22 @@ async function fetchRSSSource(source) {
         link = $el.find("link").attr("href");
       }
 
+      // Capture description/summary
+      let description = $el.find("description").text();
+      if (!description) description = $el.find("summary").text();
+      if (!description) description = $el.find("content").text();
+      if (!description) description = $el.find("content\\:encoded").text();
+
+      // Clean HTML from description
+      if (description) {
+        description = description.replace(/<[^>]*>?/gm, "").trim();
+        description = description.replace(/\s+/g, " ");
+        // Limit length for summary
+        if (description.length > 150) {
+          description = description.substring(0, 147) + "...";
+        }
+      }
+
       let pubDate = $el.find("pubDate").text().trim();
       if (!pubDate) pubDate = $el.find("published").text().trim();
       if (!pubDate) pubDate = $el.find("updated").text().trim();
@@ -166,6 +182,7 @@ async function fetchRSSSource(source) {
       if (title && link) {
         items.push({
           title,
+          description: description || "", // Add description
           url: link,
           source: source.name,
           category: source.category,
@@ -200,7 +217,7 @@ async function scrapeGitHubTrendingPage() {
           "User-Agent":
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
         },
-      }
+      },
     );
 
     const $ = cheerio.load(html);
@@ -275,7 +292,7 @@ async function getAgentCodeNews() {
 
   const sourceCount = new Set(uniqueNews.map((n) => n.source)).size;
   console.log(
-    `Agent Code News: collected ${uniqueNews.length} items from ${sourceCount} sources`
+    `Agent Code News: collected ${uniqueNews.length} items from ${sourceCount} sources`,
   );
 
   // 翻译标题（限制数量避免过慢）
@@ -296,7 +313,7 @@ async function getAgentCodeNews() {
   // 过滤只保留当天的消息
   const todayNews = filterTodayItems(translatedNews);
   console.log(
-    `Agent Code News: filtered to ${todayNews.length} items from today`
+    `Agent Code News: filtered to ${todayNews.length} items from today`,
   );
   return todayNews;
 }

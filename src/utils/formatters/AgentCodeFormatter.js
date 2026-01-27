@@ -1,6 +1,6 @@
 const {
   sectionHeader,
-  linkItem,
+  cardItem,
   formatRelativeTime,
 } = require("./DingTalkMarkdownUtils");
 
@@ -27,12 +27,18 @@ const formatAgentCode = (agentCodeNews) => {
   let message = sectionHeader("🧑‍💻", "Agent Code 前沿");
   message += "> _AI 编程助手 · Vibe Coding · 热门开源项目_\n\n";
 
-  agentCodeNews.slice(0, 8).forEach((news, index) => {
+  agentCodeNews.slice(0, 8).forEach((news) => {
     const relativeTime = formatRelativeTime(news.posted_on);
     const categoryIcon = CATEGORY_LABELS[news.category] || "📌";
-    const sourceName = `${categoryIcon} ${news.source} · ${relativeTime}`;
+    const summary = news.description || "";
 
-    message += linkItem(index + 1, news.title, news.url, sourceName);
+    message += cardItem(
+      news.title,
+      news.url,
+      summary,
+      `${categoryIcon} ${news.source}`,
+      relativeTime,
+    );
   });
 
   return message;
