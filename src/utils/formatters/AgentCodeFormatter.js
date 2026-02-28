@@ -25,9 +25,9 @@ const formatAgentCode = (agentCodeNews) => {
   if (!agentCodeNews || agentCodeNews.length === 0) return "";
 
   let message = sectionHeader("🧑‍💻", "Agent Code 前沿");
-  message += "> _AI 编程助手 · Vibe Coding · 热门开源项目_\n\n";
+  message += "> _AI编程助手 · Vibe Coding · 热门项目_\n\n";
 
-  agentCodeNews.slice(0, 8).forEach((news) => {
+  agentCodeNews.slice(0, 10).forEach((news) => {
     const relativeTime = formatRelativeTime(news.posted_on);
     const categoryIcon = CATEGORY_LABELS[news.category] || "📌";
     const summary = news.description || "";

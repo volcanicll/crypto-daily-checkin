@@ -9,6 +9,7 @@ const formatGold = (goldData) => {
   if (!goldData || (!goldData.ny_gold && !goldData.cn_gold)) return "";
 
   let message = sectionHeader("🏆", "今日金价");
+  message += "> _实时贵金属价格行情_\n\n";
 
   if (goldData.cn_gold) {
     const { price, change_percent, name } = goldData.cn_gold;

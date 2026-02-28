@@ -20,6 +20,9 @@ const contentModules = {
   // Agent Code 资讯模块 (默认启用)
   agentCode: process.env.MODULE_AGENT_CODE !== "false",
 
+  // V2EX 日报模块 (默认启用)
+  v2ex: process.env.MODULE_V2EX !== "false",
+
   // X/Twitter 热门技术贴模块 (默认禁用，需配置 RAPID_API_KEY)
   xTwitter: process.env.MODULE_X_TWITTER === "true",
 

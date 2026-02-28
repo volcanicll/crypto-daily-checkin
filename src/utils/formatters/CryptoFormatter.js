@@ -16,6 +16,7 @@ const {
  */
 const formatCrypto = ({ marketData, newsData, sentimentData }) => {
   let message = sectionHeader("💰", "加密行情");
+  message += "> _主流币价格 · 恐慌贪婪指数_\n\n";
 
   // Sentiment Data (Fear & Greed)
   if (sentimentData) {

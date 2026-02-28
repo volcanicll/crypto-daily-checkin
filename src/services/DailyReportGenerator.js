@@ -4,6 +4,7 @@ const { getGoldPrice } = require("./finance/gold");
 const { getAINews } = require("./tech/aiNews");
 const { getAgentCodeNews } = require("./tech/agentCodeNews");
 const { getXTwitterNews } = require("./tech/xTwitterNews");
+const { getV2exNews } = require("./tech/v2exNews");
 const { getFearAndGreedIndex } = require("./crypto/sentiment");
 const llmService = require("./llm/LLMService");
 
@@ -12,6 +13,7 @@ const { formatGold } = require("../utils/formatters/GoldFormatter");
 const { formatAiNews } = require("../utils/formatters/AiNewsFormatter");
 const { formatAgentCode } = require("../utils/formatters/AgentCodeFormatter");
 const { formatXTwitter } = require("../utils/formatters/XTwitterFormatter");
+const { formatV2ex } = require("../utils/formatters/V2exFormatter");
 const { formatCommentary } = require("../utils/formatters/CommentaryFormatter");
 const {
   formatAiRecommendations,
@@ -82,6 +84,13 @@ class DailyReportGenerator {
         });
       }
 
+      if (contentModules.v2ex) {
+        dataPromises.v2ex = getV2exNews().catch((e) => {
+          console.error("V2EX News fetch error", e);
+          return [];
+        });
+      }
+
       if (contentModules.xTwitter) {
         dataPromises.xTwitter = getXTwitterNews().catch((e) => {
           console.error("X/Twitter News fetch error", e);
@@ -131,6 +140,10 @@ class DailyReportGenerator {
         formattedParts.push(formatAgentCode(data.agentCode));
       }
 
+      if (contentModules.v2ex && data.v2ex) {
+        formattedParts.push(formatV2ex(data.v2ex));
+      }
+
       if (contentModules.xTwitter && data.xTwitter) {
         formattedParts.push(formatXTwitter(data.xTwitter));
       }
@@ -141,6 +154,7 @@ class DailyReportGenerator {
         const allNews = [
           ...(data.aiNews || []),
           ...(data.agentCode || []),
+          ...(data.v2ex || []),
           ...(data.xTwitter || []),
         ];
         if (allNews.length > 0) {

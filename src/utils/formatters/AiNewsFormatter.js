@@ -13,6 +13,7 @@ const formatAiNews = (aiNews) => {
   if (!aiNews || aiNews.length === 0) return "";
 
   let message = sectionHeader("🤖", "AI 前沿资讯");
+  message += "> _大模型动态 · 研究前沿 · 行业新闻_\n\n";
 
   aiNews.slice(0, 10).forEach((news) => {
     const relativeTime = formatRelativeTime(news.posted_on);
