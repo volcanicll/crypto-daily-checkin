@@ -1,7 +1,8 @@
 const HttpClient = require("../../utils/http");
 const http = new HttpClient();
 const cheerio = require("cheerio");
-const { translateToChinese, filterTodayItems } = require("../../utils/common");
+const { translateBatch } = require("../../utils/translation");
+const { filterTodayItems } = require("../../utils/common");
 
 /**
  * Agent Code / Vibe Coding 相关 RSS 源
@@ -295,20 +296,18 @@ async function getAgentCodeNews() {
     `Agent Code News: collected ${uniqueNews.length} items from ${sourceCount} sources`,
   );
 
-  // 翻译标题（限制数量避免过慢）
-  const translatedNews = [];
-  for (const item of uniqueNews.slice(0, 25)) {
-    try {
-      translatedNews.push({
-        ...item,
-        title: await translateToChinese(item.title),
-      });
-    } catch (transError) {
-      console.warn(`Failed to translate: ${transError.message}`);
-      translatedNews.push(item);
-    }
-    await new Promise((r) => setTimeout(r, 100));
-  }
+  // 使用并行翻译优化性能
+  const itemsToTranslate = uniqueNews.slice(0, 25);
+  console.log(`Translating ${itemsToTranslate.length} Agent Code news items...`);
+
+  // 并行翻译标题
+  await translateBatch(
+    itemsToTranslate,
+    (item) => item.title,
+    (item, translated) => { item.title = translated; }
+  );
+
+  const translatedNews = itemsToTranslate;
 
   // 过滤只保留当天的消息
   const todayNews = filterTodayItems(translatedNews);

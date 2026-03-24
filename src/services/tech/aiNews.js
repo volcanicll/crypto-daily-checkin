@@ -1,7 +1,8 @@
 const HttpClient = require("../../utils/http");
 const http = new HttpClient();
 const cheerio = require("cheerio");
-const { translateToChinese, filterTodayItems } = require("../../utils/common");
+const { translateBatch } = require("../../utils/translation");
+const { filterTodayItems } = require("../../utils/common");
 
 const AI_SOURCES = [
   {
@@ -125,23 +126,25 @@ async function getAINews() {
     `AI News: collected ${allNews.length} items from ${sourceCount} sources`
   );
 
-  // Translate AI news sequentially (limit to avoid slowness)
-  const translatedAiNews = [];
-  for (const item of allNews.slice(0, 20)) {
-    try {
-      translatedAiNews.push({
-        ...item,
-        title: await translateToChinese(item.title),
-        description: await translateToChinese(item.description),
-      });
-    } catch (transError) {
-      console.warn(
-        `Failed to translate item from ${item.author}: ${transError.message}`
-      );
-      translatedAiNews.push(item);
-    }
-    await new Promise((r) => setTimeout(r, 100));
-  }
+  // 使用并行翻译优化性能
+  const itemsToTranslate = allNews.slice(0, 20);
+  console.log(`Translating ${itemsToTranslate.length} AI news items...`);
+
+  // 并行翻译标题
+  await translateBatch(
+    itemsToTranslate,
+    (item) => item.title,
+    (item, translated) => { item.title = translated; }
+  );
+
+  // 并行翻译描述
+  await translateBatch(
+    itemsToTranslate,
+    (item) => item.description,
+    (item, translated) => { item.description = translated; }
+  );
+
+  const translatedAiNews = itemsToTranslate;
 
   // 过滤只保留当天的消息
   const todayNews = filterTodayItems(translatedAiNews);

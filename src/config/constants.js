@@ -35,8 +35,199 @@ const GREETINGS = new Map([
 
 const DAYS_OF_WEEK = ["星期天", "周一", "周二", "周三", "周四", "周五", "周六"];
 
+/**
+ * API 配置
+ */
+const API_CONFIG = {
+  timeout: 10000,           // 请求超时时间 (ms)
+  retryAttempts: 3,         // 最大重试次数
+  retryInitialDelay: 1000,  // 初始重试延迟 (ms)
+  retryMultiplier: 2,       // 退避乘数
+};
+
+/**
+ * 翻译配置
+ */
+const TRANSLATION_CONFIG = {
+  batchSize: 5,             // 每批翻译数量
+  delay: 200,               // 批次间延迟 (ms)
+  maxLength: 5000,          // 单次翻译最大长度
+  // 中文正则，用于检测是否需要翻译
+  chineseRegex: /[\u4e00-\u9fa5]/,
+};
+
+/**
+ * 内容过滤配置
+ */
+const FILTER_CONFIG = {
+  // X/Twitter 过滤
+  minViews: 10000,          // 最小浏览量
+  minReplies: 0,            // 最小回复数
+
+  // 通用配置
+  maxItemsPerSource: 20,    // 每个源最大条数
+  daysToKeep: 7,            // 保留天数
+
+  // V2EX 评分配置
+  v2exGravity: 1.8,         // 时间衰减指数
+};
+
+/**
+ * LLM 配置
+ */
+const LLM_CONFIG = {
+  // Token 限制
+  maxTokens: {
+    commentary: 200,        // 市场评论最大 token
+    recommendations: 300,   // AI 推荐最大 token
+    highlights: 400,        // 新闻亮点最大 token
+  },
+
+  // Temperature 配置
+  temperature: {
+    commentary: 0.8,        // 市场评论 (更有创意)
+    recommendations: 0.7,   // AI 推荐 (平衡)
+    highlights: 0.6,        // 新闻亮点 (更准确)
+    professional: 0.5,      // 专业风格 (更严肃)
+  },
+
+  // 评论风格
+  styles: {
+    humor: "humor",         // 幽默风格
+    professional: "professional",  // 专业风格
+    concise: "concise",     // 简洁风格
+  },
+
+  // 默认风格
+  defaultStyle: "humor",
+};
+
+/**
+ * 格式化限制
+ */
+const FORMAT_LIMITS = {
+  titleLength: 50,          // 标题最大长度
+  summaryLength: 100,       // 摘要最大长度
+  descriptionLength: 200,   // 描述最大长度
+  urlDisplayLength: 40,     // URL 显示长度
+
+  // 截断后缀
+  ellipsis: "...",
+};
+
+/**
+ * 缓存配置
+ */
+const CACHE_CONFIG = {
+  rssTTL: 15 * 60 * 1000,   // RSS 缓存时间 (15分钟)
+  translationTTL: 60 * 60 * 1000,  // 翻译缓存时间 (1小时)
+};
+
+/**
+ * 新闻源配置
+ */
+const NEWS_SOURCES = {
+  // 宏观金融新闻关键词
+  macroKeywords: [
+    "Fed", "Federal Reserve", "interest rate", "inflation",
+    "GDP", "unemployment", "recession", "treasury",
+    "yield curve", "CPI", "PPI", "FOMC", "rate hike",
+    "rate cut", "monetary policy", "economic data"
+  ],
+
+  // 宏观金融新闻 RSS 源
+  macroRSS: [
+    {
+      name: "CNBC Markets",
+      url: "https://www.cnbc.com/id/100003114/device/rss/rss.html",
+    },
+    {
+      name: "Reuters Business",
+      url: "https://www.reutersagency.com/feed/",
+    },
+    {
+      name: "Bloomberg Markets",
+      url: "https://feeds.bloomberg.com/markets/news.rss",
+    },
+  ],
+
+  // 扩展的加密货币新闻源
+  cryptoRSS: [
+    {
+      name: "CoinTelegraph",
+      url: "https://cointelegraph.com/rss",
+    },
+    {
+      name: "BeInCrypto",
+      url: "https://beincrypto.com/feed/",
+    },
+    {
+      name: "TheBlock",
+      url: "https://www.theblockcrypto.com/rss.xml",
+    },
+    {
+      name: "Decrypt",
+      url: "https://decrypt.co/feed",
+    },
+  ],
+
+  // AI/VC 机构博客
+  vcBlogs: [
+    {
+      name: "a16z",
+      url: "https://a16z.com/feed/",
+    },
+    {
+      name: "Paradigm",
+      url: "https://paradigm.xyz/feed.xml",
+    },
+    {
+      name: "Pantera",
+      url: "https://panteracapital.com/blog/feed/",
+    },
+  ],
+};
+
+/**
+ * 表情符号配置
+ */
+const EMOJI = {
+  // 分类图标
+  macro: "🏛️",
+  crypto: "💰",
+  ai: "🤖",
+  agentCode: "👨‍💻",
+  v2ex: "🇻🇳",
+  twitter: "🐦",
+  highlights: "📌",
+  market: "📊",
+  gold: "🪙",
+
+  // 情绪图标
+  fearGreed: {
+    extremeFear: "😱",
+    fear: "😨",
+    neutral: "😐",
+    greed: "😊",
+    extremeGreed: "🤑",
+  },
+
+  // 涨跌图标
+  up: "📈",
+  down: "📉",
+  flat: "➡️",
+};
+
 module.exports = {
   BASE_URL,
   GREETINGS,
   DAYS_OF_WEEK,
+  API_CONFIG,
+  TRANSLATION_CONFIG,
+  FILTER_CONFIG,
+  LLM_CONFIG,
+  FORMAT_LIMITS,
+  CACHE_CONFIG,
+  NEWS_SOURCES,
+  EMOJI,
 };

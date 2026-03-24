@@ -1,17 +1,20 @@
 {
-  "name": "crypto-daily-checkin",
-  "version": "1.0.0",
-  "description": "Daily warm heart push",
+  "name": "tech-daily",
+  "version": "2.0.0",
+  "description": "Daily tech digest covering crypto, AI, and developer news",
   "main": "src/app.js",
   "scripts": {
     "start": "bun src/app.js",
     "dev": "bun --watch src/app.js"
   },
   "keywords": [
+    "tech",
+    "daily",
+    "digest",
     "crypto",
-    "check-in",
+    "ai",
     "automation",
-    "cryptocurrency",
+    "newsletter",
     "notification"
   ],
   "author": "",

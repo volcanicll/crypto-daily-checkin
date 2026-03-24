@@ -3,18 +3,7 @@ const {
   cardItem,
   formatRelativeTime,
 } = require("./DingTalkMarkdownUtils");
-
-/**
- * 分类标签映射
- */
-const CATEGORY_LABELS = {
-  official: "📢",
-  opensource: "⭐",
-  community: "💬",
-  devtools: "🔧",
-  newsletter: "📰",
-  twitter: "📌",
-};
+const { EMOJI } = require("../../config/constants");
 
 /**
  * Format Agent Code news data
@@ -24,19 +13,18 @@ const CATEGORY_LABELS = {
 const formatAgentCode = (agentCodeNews) => {
   if (!agentCodeNews || agentCodeNews.length === 0) return "";
 
-  let message = sectionHeader("🧑‍💻", "Agent Code 前沿");
+  let message = sectionHeader(EMOJI.agentCode, "Agent Code 前沿");
   message += "> _AI编程助手 · Vibe Coding · 热门项目_\n\n";
 
   agentCodeNews.slice(0, 10).forEach((news) => {
     const relativeTime = formatRelativeTime(news.posted_on);
-    const categoryIcon = CATEGORY_LABELS[news.category] || "📌";
     const summary = news.description || "";
 
     message += cardItem(
       news.title,
       news.url,
       summary,
-      `${categoryIcon} ${news.source}`,
+      news.source,
       relativeTime,
     );
   });

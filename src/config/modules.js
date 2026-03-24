@@ -23,6 +23,12 @@ const contentModules = {
   // V2EX 日报模块 (默认启用)
   v2ex: process.env.MODULE_V2EX !== "false",
 
+  // 宏观金融新闻模块 (默认启用)
+  macro: process.env.MODULE_MACRO_NEWS !== "false",
+
+  // 新闻亮点模块 (默认启用)
+  newsHighlights: process.env.MODULE_NEWS_HIGHLIGHTS !== "false",
+
   // X/Twitter 热门技术贴模块 (默认禁用，需配置 RAPID_API_KEY)
   xTwitter: process.env.MODULE_X_TWITTER === "true",
 

@@ -5,8 +5,10 @@ const { getAINews } = require("./tech/aiNews");
 const { getAgentCodeNews } = require("./tech/agentCodeNews");
 const { getXTwitterNews } = require("./tech/xTwitterNews");
 const { getV2exNews } = require("./tech/v2exNews");
+const { getMacroNews } = require("./tech/macroNews");
 const { getFearAndGreedIndex } = require("./crypto/sentiment");
 const llmService = require("./llm/LLMService");
+const newsHighlightsService = require("./llm/NewsHighlightsService");
 
 const { formatCrypto } = require("../utils/formatters/CryptoFormatter");
 const { formatGold } = require("../utils/formatters/GoldFormatter");
@@ -14,6 +16,8 @@ const { formatAiNews } = require("../utils/formatters/AiNewsFormatter");
 const { formatAgentCode } = require("../utils/formatters/AgentCodeFormatter");
 const { formatXTwitter } = require("../utils/formatters/XTwitterFormatter");
 const { formatV2ex } = require("../utils/formatters/V2exFormatter");
+const { formatMacroNews } = require("../utils/formatters/MacroFormatter");
+const { formatNewsHighlights } = require("../utils/formatters/NewsHighlightsFormatter");
 const { formatCommentary } = require("../utils/formatters/CommentaryFormatter");
 const {
   formatAiRecommendations,
@@ -91,6 +95,13 @@ class DailyReportGenerator {
         });
       }
 
+      if (contentModules.macro) {
+        dataPromises.macro = getMacroNews().catch((e) => {
+          console.error("Macro News fetch error", e);
+          return [];
+        });
+      }
+
       if (contentModules.xTwitter) {
         dataPromises.xTwitter = getXTwitterNews().catch((e) => {
           console.error("X/Twitter News fetch error", e);
@@ -106,24 +117,10 @@ class DailyReportGenerator {
         return acc;
       }, {});
 
-      // LLM 锐评需要其他模块数据，单独处理
-      let commentary = null;
-      if (contentModules.llmCommentary) {
-        console.log("正在生成 AI 锐评...");
-        commentary = await llmService.generateCommentary({
-          goldData: data.gold || null,
-          cryptoData: data.crypto || {
-            marketData: [],
-            newsData: [],
-            sentimentData: null,
-          },
-          aiNews: data.aiNews || [],
-        });
-      }
-
       // 按配置顺序格式化内容
       const formattedParts = [];
 
+      // 市场数据先行
       if (contentModules.gold && data.gold) {
         formattedParts.push(formatGold(data.gold));
       }
@@ -132,6 +129,32 @@ class DailyReportGenerator {
         formattedParts.push(formatCrypto(data.crypto));
       }
 
+      // 新闻亮点（AI 识别的重要头条）
+      let highlights = null;
+      if (contentModules.newsHighlights) {
+        const allNews = [
+          ...(data.aiNews || []),
+          ...(data.agentCode || []),
+          ...(data.v2ex || []),
+          ...(data.xTwitter || []),
+          ...(data.macro || []),
+        ];
+        if (allNews.length > 0) {
+          console.log("正在生成新闻亮点...");
+          highlights = await newsHighlightsService.generateHighlights(allNews, 5);
+        }
+      }
+
+      if (highlights && highlights.length > 0) {
+        formattedParts.push(formatNewsHighlights(highlights));
+      }
+
+      // 宏观要闻（影响市场的关键因素）
+      if (contentModules.macro && data.macro && data.macro.length > 0) {
+        formattedParts.push(formatMacroNews(data.macro));
+      }
+
+      // 其他资讯内容
       if (contentModules.aiNews && data.aiNews) {
         formattedParts.push(formatAiNews(data.aiNews));
       }
@@ -148,29 +171,58 @@ class DailyReportGenerator {
         formattedParts.push(formatXTwitter(data.xTwitter));
       }
 
-      // AI 精选推荐：合并所有资讯，让 AI 筛选最有价值的
+      // 并行执行 LLM 调用（commentary 和 recommendations）
+      const llmPromises = [];
+      let commentary = null;
       let aiRecommendations = null;
+
+      // AI 精选推荐
       if (contentModules.aiRecommendations) {
         const allNews = [
           ...(data.aiNews || []),
           ...(data.agentCode || []),
           ...(data.v2ex || []),
           ...(data.xTwitter || []),
+          ...(data.macro || []),
         ];
         if (allNews.length > 0) {
           console.log("正在生成 AI 精选推荐...");
-          aiRecommendations = await llmService.generateRecommendations(
-            allNews,
-            6
+          llmPromises.push(
+            llmService.generateRecommendations(allNews, 6).then(result => {
+              aiRecommendations = result;
+            })
           );
         }
       }
 
+      // AI 锐评（与 recommendations 并行）
+      if (contentModules.llmCommentary) {
+        console.log("正在生成 AI 锐评...");
+        llmPromises.push(
+          llmService.generateCommentary({
+            goldData: data.gold || null,
+            cryptoData: data.crypto || {
+              marketData: [],
+              newsData: [],
+              sentimentData: null,
+            },
+            aiNews: data.aiNews || [],
+            macroNews: data.macro || [],
+          }).then(result => {
+            commentary = result;
+          })
+        );
+      }
+
+      // 等待所有 LLM 调用完成
+      await Promise.all(llmPromises);
+
+      // 添加 AI 生成的内容
       if (aiRecommendations && aiRecommendations.length > 0) {
         formattedParts.push(formatAiRecommendations(aiRecommendations));
       }
 
-      if (contentModules.llmCommentary && commentary) {
+      if (commentary) {
         formattedParts.push(formatCommentary(commentary));
       }
 

@@ -3,6 +3,7 @@ const {
   formatRelativeTime,
   cardItem,
 } = require("./DingTalkMarkdownUtils");
+const { EMOJI } = require("../../config/constants");
 
 /**
  * 格式化互动数据
@@ -13,18 +14,18 @@ const formatEngagement = (engagement) => {
   if (!engagement) return "";
   const parts = [];
   if (engagement.views >= 10000) {
-    parts.push(`👁 ${(engagement.views / 10000).toFixed(1)}w`);
+    parts.push(`${(engagement.views / 10000).toFixed(1)}万阅读`);
   }
   if (engagement.favorites > 0) {
-    parts.push(`❤️ ${engagement.favorites}`);
+    parts.push(`${engagement.favorites}赞`);
   }
   if (engagement.retweets > 0) {
-    parts.push(`🔄 ${engagement.retweets}`);
+    parts.push(`${engagement.retweets}转`);
   }
   if (engagement.replies > 0) {
-    parts.push(`💬 ${engagement.replies}`);
+    parts.push(`${engagement.replies}评`);
   }
-  return parts.join(" ");
+  return parts.join(" · ");
 };
 
 /**
@@ -35,7 +36,7 @@ const formatEngagement = (engagement) => {
 const formatXTwitter = (xTwitterNews) => {
   if (!xTwitterNews || xTwitterNews.length === 0) return "";
 
-  let message = sectionHeader("𝕏", "X/Twitter 热门");
+  let message = sectionHeader(EMOJI.twitter, "X/Twitter 热门");
   message += "> _AI · Agent Code · 技术热帖_\n\n";
 
   xTwitterNews.slice(0, 8).forEach((news) => {
@@ -50,13 +51,20 @@ const formatXTwitter = (xTwitterNews) => {
     // Clean newlines in title for the link part
     title = title.replace(/[\r\n]+/g, " ");
 
-    if (title.length > 40) {
-      summary = news.title; // Use full text as summary (can preserve newlines in logic, but cardItem cleans it)
-      title = title.substring(0, 40) + "..."; // Short title for the link
+    if (title.length > 50) {
+      summary = news.title; // Use full text as summary
+      title = title.substring(0, 47) + "..."; // Short title for the link
     } else {
       // Short tweet, no summary needed, just title link
       summary = null;
     }
+
+    // 构建元信息（时间和互动）
+    const metaParts = [relativeTime];
+    if (engagementStr) {
+      metaParts.push(engagementStr);
+    }
+    const meta = metaParts.join(" | ");
 
     // Use cardItem for consistency
     message += cardItem(
@@ -64,7 +72,7 @@ const formatXTwitter = (xTwitterNews) => {
       news.url,
       summary,
       news.source,
-      `${relativeTime}${engagementStr ? " | " + engagementStr : ""}`,
+      meta
     );
   });
 

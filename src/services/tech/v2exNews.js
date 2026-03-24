@@ -147,23 +147,53 @@ function scoreAndRank(items, topN, excludeNodes = []) {
 }
 
 /**
+ * 清理内容文本（移除 Markdown 标题和格式）
+ * @param {string} content - 原始内容
+ * @param {number} maxLength - 最大长度
+ * @returns {string}
+ */
+function cleanContent(content, maxLength = 150) {
+  if (!content) return "";
+
+  // 移除 Markdown 标题（#、##、### 等）
+  let cleaned = content.replace(/^#{1,6}\s+/gm, "");
+  // 移除加粗标记
+  cleaned = cleaned.replace(/\*\*/g, "");
+  // 移除多余空行
+  cleaned = cleaned.replace(/\n{3,}/g, "\n\n");
+  // 移除所有换行符，用空格代替
+  cleaned = cleaned.replace(/[\r\n]+/g, " ");
+  // 移除多余空格
+  cleaned = cleaned.replace(/\s{2,}/g, " ");
+
+  // 截断
+  if (cleaned.length > maxLength) {
+    return cleaned.substring(0, maxLength - 3) + "...";
+  }
+  return cleaned;
+}
+
+/**
  * 获取 V2EX 日报
  * @returns {Promise<Array>}
  */
 async function getV2exNews() {
   const client = new V2EXClient();
-  const allTopics = [];
 
   // 并行获取所有配置源
-  for (const source of V2EX_CONFIG.sources) {
+  const sourcePromises = V2EX_CONFIG.sources.map(async (source) => {
     try {
       console.log(`Fetching V2EX topics from ${source}...`);
       const topics = await client.fetchBySource(source);
-      allTopics.push(...topics);
+      return topics;
     } catch (error) {
       console.error(`Error fetching V2EX ${source}:`, error.message);
+      return [];
     }
-  }
+  });
+
+  const sourcesResults = await Promise.all(sourcePromises);
+  const allTopics = sourcesResults.flat();
 
   console.log(`V2EX: collected ${allTopics.length} topics`);
 
@@ -179,8 +209,8 @@ async function getV2exNews() {
     id: s.item.id,
     title: s.item.title,
     url: s.item.url,
-    description: s.item.content.substring(0, 200) + "...",
-    source: `V2EX · ${s.item.nodeTitle || s.item.nodeName}`,
+    description: cleanContent(s.item.content, 150),
+    source: s.item.nodeTitle || s.item.nodeName,
     author: s.item.author,
     posted_on: new Date(s.item.created * 1000).toISOString(),
     replies: s.item.replies,

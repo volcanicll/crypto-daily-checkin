@@ -3,6 +3,23 @@
  * 提供针对钉钉机器人消息优化的 Markdown 格式化方法
  */
 
+const { FORMAT_LIMITS } = require("../../config/constants");
+
+/**
+ * 截断文本工具
+ * @param {string} text - 原始文本
+ * @param {number} maxLength - 最大长度
+ * @param {string} suffix - 截断后缀
+ * @returns {string}
+ */
+function truncateText(text, maxLength = FORMAT_LIMITS.titleLength, suffix = FORMAT_LIMITS.ellipsis) {
+  if (!text) return "";
+  const clean = text.replace(/[\r\n]+/g, " ").replace(/[\[\]]/g, "");
+  return clean.length > maxLength
+    ? clean.substring(0, maxLength - suffix.length) + suffix
+    : clean;
+}
+
 /**
  * 生成模块标题
  * @param {string} icon - emoji 图标
@@ -15,38 +32,33 @@ const sectionHeader = (icon, title) => {
 
 /**
  * 生成卡片式条目 (UI/UX Pro Max)
- * @param {string} title - 标题
- * @param {string} url - 链接
- * @param {string} summary - 摘要/引文
- * @param {string} source - 来源
- * @param {string} time - 时间
- * @returns {string}
+ * 支持两种调用方式：
+ * 1. cardItem({ title, url, summary, source, time })
+ * 2. cardItem(title, url, summary, source, time) - 向后兼容
  */
-const cardItem = (title, url, summary, source, time) => {
-  // Clean title: remove newlines, brackets, and limit length efficiently
-  const cleanTitleStr = title.replace(/[\r\n]+/g, " ").replace(/[\[\]]/g, "");
-  const safeTitle =
-    cleanTitleStr.length > 50
-      ? cleanTitleStr.substring(0, 47) + "..."
-      : cleanTitleStr;
+const cardItem = (...args) => {
+  // 解析参数（支持对象和传统多参数）
+  let title, url, summary, source, time;
+
+  if (args.length === 1 && typeof args[0] === 'object') {
+    // 对象参数
+    ({ title, url, summary, source, time } = args[0]);
+  } else {
+    // 传统多参数（向后兼容）
+    [title, url, summary, source, time] = args;
+  }
+
+  const safeTitle = truncateText(title, FORMAT_LIMITS.titleLength);
 
   let item = `- **[${safeTitle}](${url})**\n`;
 
   if (summary) {
-    // 使用引用块作为卡片内容背景
-    // 限制摘要长度, Remove newlines from summary to keep blockquote clean
-    const cleanSummaryText = summary.replace(/[\r\n]+/g, " ");
-    const cleanSummary =
-      cleanSummaryText.length > 100
-        ? cleanSummaryText.substring(0, 97) + "..."
-        : cleanSummaryText;
+    const cleanSummary = truncateText(summary, FORMAT_LIMITS.summaryLength);
     item += `> ${cleanSummary}\n`;
   }
 
   const metaParts = [source, time].filter(Boolean);
   if (metaParts.length > 0) {
-    // Meta信息放在引用块内或紧接其后，这里放在引用块最后一行看起来更像卡片底部
-    // 使用斜体区分
     item += `> *${metaParts.join(" · ")}*\n`;
   }
 
@@ -85,22 +97,26 @@ const priceItem = (icon, name, price, change) => {
 
 /**
  * 生成链接列表项 (无序列表)
- * @param {string} title - 标题
- * @param {string} url - 链接
- * @param {string} [source] - 来源
- * @returns {string}
+ * 支持两种调用方式：
+ * 1. linkItem({ title, url, source })
+ * 2. linkItem(title, url, source) - 向后兼容
  */
-const linkItem = (title, url, source = null) => {
-  // 限制标题长度
-  const truncatedTitle =
-    title.length > 50 ? title.substring(0, 47) + "..." : title;
+const linkItem = (...args) => {
+  // 解析参数（支持对象和传统多参数）
+  let title, url, source;
 
-  // 移除标题中可能破坏 Markdown 的字符
-  const safeTitle = truncatedTitle.replace(/[\[\]]/g, "");
+  if (args.length === 1 && typeof args[0] === 'object') {
+    // 对象参数
+    ({ title, url, source } = args[0]);
+  } else {
+    // 传统多参数（向后兼容）
+    [title, url, source] = args;
+  }
+
+  const safeTitle = truncateText(title, FORMAT_LIMITS.titleLength);
 
   let item = `- [${safeTitle}](${url})`;
   if (source) {
-    // 来源使用更小的字体感觉（虽然钉钉不支持小字体，但可以用斜体区分）
     item += `  _${source}_`;
   }
   return item + "\n";
@@ -108,17 +124,23 @@ const linkItem = (title, url, source = null) => {
 
 /**
  * 生成 Agent Code 风格的链接项（带加粗）
- * @param {string} title - 标题
- * @param {string} url - 链接
- * @param {string} source - 来源
- * @param {string} [time] - 时间
- * @returns {string}
+ * 支持两种调用方式：
+ * 1. agentCodeLinkItem({ title, url, source, time })
+ * 2. agentCodeLinkItem(title, url, source, time) - 向后兼容
  */
-const agentCodeLinkItem = (title, url, source, time = null) => {
-  const truncatedTitle =
-    title.length > 45 ? title.substring(0, 42) + "..." : title;
+const agentCodeLinkItem = (...args) => {
+  // 解析参数（支持对象和传统多参数）
+  let title, url, source, time;
 
-  const safeTitle = truncatedTitle.replace(/[\[\]]/g, "");
+  if (args.length === 1 && typeof args[0] === 'object') {
+    // 对象参数
+    ({ title, url, source, time } = args[0]);
+  } else {
+    // 传统多参数（向后兼容）
+    [title, url, source, time] = args;
+  }
+
+  const safeTitle = truncateText(title, 45);
 
   let item = `- **[${safeTitle}](${url})**`;
 
@@ -168,12 +190,21 @@ const formatRelativeTime = (dateStr) => {
     const date = new Date(dateStr);
     const now = new Date();
     const diffMs = now - date;
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-    if (diffHours < 1) return "刚刚";
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
+    // 1小时内显示分钟
+    if (diffMinutes < 1) return "刚刚";
+    if (diffMinutes < 60) return `${diffMinutes}分钟前`;
+
+    // 24小时内显示小时
+    if (diffHours < 24) return `${diffHours}小时前`;
+
+    // 7天内显示天
+    if (diffDays < 7) return `${diffDays}天前`;
+
+    // 更早显示日期
     return date.toLocaleDateString("zh-CN", { month: "short", day: "numeric" });
   } catch {
     return "";
@@ -207,4 +238,5 @@ module.exports = {
   priceTable,
   formatRelativeTime,
   messageHeader,
+  truncateText, // 导出工具函数供其他模块使用
 };
