@@ -202,6 +202,9 @@ const EMOJI = {
   highlights: "📌",
   market: "📊",
   gold: "🪙",
+  aiModels: "🧪",
+  githubStars: "🔥",
+  productHunt: "🚀",
 
   // 情绪图标
   fearGreed: {

@@ -7,6 +7,9 @@ const { getXTwitterNews } = require("./tech/xTwitterNews");
 const { getV2exNews } = require("./tech/v2exNews");
 const { getMacroNews } = require("./tech/macroNews");
 const { getFearAndGreedIndex } = require("./crypto/sentiment");
+const { getAIModelsNews } = require("./tech/aiModelsTracker");
+const { getGitHubNewStars } = require("./tech/githubNewStars");
+const { getProductHuntNews } = require("./tech/productHuntNews");
 const horizonService = require("./horizon/HorizonService");
 const llmService = require("./llm/LLMService");
 const newsHighlightsService = require("./llm/NewsHighlightsService");
@@ -21,6 +24,9 @@ const { formatV2ex } = require("../utils/formatters/V2exFormatter");
 const { formatMacroNews } = require("../utils/formatters/MacroFormatter");
 const { formatNewsHighlights } = require("../utils/formatters/NewsHighlightsFormatter");
 const { formatCommentary } = require("../utils/formatters/CommentaryFormatter");
+const { formatAIModels } = require("../utils/formatters/AIModelsFormatter");
+const { formatGitHubStars } = require("../utils/formatters/GitHubStarsFormatter");
+const { formatProductHunt } = require("../utils/formatters/ProductHuntFormatter");
 const {
   formatAiRecommendations,
 } = require("../utils/formatters/AiRecommendationsFormatter");
@@ -118,6 +124,27 @@ class DailyReportGenerator {
         });
       }
 
+      if (contentModules.aiModels) {
+        dataPromises.aiModels = getAIModelsNews().catch((e) => {
+          console.error("AI Models fetch error", e);
+          return [];
+        });
+      }
+
+      if (contentModules.githubStars) {
+        dataPromises.githubStars = getGitHubNewStars().catch((e) => {
+          console.error("GitHub Stars fetch error", e);
+          return [];
+        });
+      }
+
+      if (contentModules.productHunt) {
+        dataPromises.productHunt = getProductHuntNews().catch((e) => {
+          console.error("Product Hunt fetch error", e);
+          return [];
+        });
+      }
+
       // 等待所有数据获取完成
       const keys = Object.keys(dataPromises);
       const values = await Promise.all(Object.values(dataPromises));
@@ -160,6 +187,9 @@ class DailyReportGenerator {
           ...(data.v2ex || []),
           ...(data.xTwitter || []),
           ...(data.macro || []),
+          ...(data.aiModels || []),
+          ...(data.githubStars || []),
+          ...(data.productHunt || []),
           ...horizonNews,
         ];
         if (allNews.length > 0) {
@@ -189,6 +219,21 @@ class DailyReportGenerator {
 
       if (contentModules.agentCode && data.agentCode) {
         formattedParts.push(formatAgentCode(data.agentCode));
+      }
+
+      // AI 模型排行（HuggingFace Trending）
+      if (contentModules.aiModels && data.aiModels) {
+        formattedParts.push(formatAIModels(data.aiModels));
+      }
+
+      // 开源新星（GitHub 新热门仓库）
+      if (contentModules.githubStars && data.githubStars) {
+        formattedParts.push(formatGitHubStars(data.githubStars));
+      }
+
+      // 科技新品（Product Hunt）
+      if (contentModules.productHunt && data.productHunt) {
+        formattedParts.push(formatProductHunt(data.productHunt));
       }
 
       if (contentModules.v2ex && data.v2ex) {
@@ -225,6 +270,9 @@ class DailyReportGenerator {
           ...(data.v2ex || []),
           ...(data.xTwitter || []),
           ...(data.macro || []),
+          ...(data.aiModels || []),
+          ...(data.githubStars || []),
+          ...(data.productHunt || []),
           ...horizonNews,
         ];
         if (allNews.length > 0) {

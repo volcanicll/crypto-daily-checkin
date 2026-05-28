@@ -58,6 +58,16 @@ const env = {
   rapidApi: {
     key: process.env.RAPID_API_KEY || "",
   },
+
+  // Product Hunt API 配置
+  productHunt: {
+    token: process.env.PRODUCTHUNT_API_TOKEN || "",
+  },
+
+  // GitHub API 配置 (可选，提升 rate limit)
+  github: {
+    token: process.env.GITHUB_TOKEN || "",
+  },
 };
 
 /**

@@ -46,6 +46,15 @@ const contentModules = {
 
   // 情话/一言模块 (默认禁用)
   quote: process.env.MODULE_QUOTE === "true",
+
+  // AI 模型排行模块 (默认启用)
+  aiModels: process.env.MODULE_AI_MODELS !== "false",
+
+  // GitHub 新热门仓库模块 (默认启用)
+  githubStars: process.env.MODULE_GITHUB_STARS !== "false",
+
+  // Product Hunt 新品模块 (默认禁用，需配置 PRODUCTHUNT_API_TOKEN)
+  productHunt: process.env.MODULE_PRODUCT_HUNT === "true",
 };
 
 /**

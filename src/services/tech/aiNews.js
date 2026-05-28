@@ -35,6 +35,11 @@ const AI_SOURCES = [
     url: "https://rss.arxiv.org/rss/cs.ai",
     isRss: true,
   },
+  {
+    name: "TLDR Tech",
+    url: "https://tldr.tech/tech.rss",
+    isRss: true,
+  },
 ];
 
 /**
