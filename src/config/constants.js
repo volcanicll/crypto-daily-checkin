@@ -205,6 +205,9 @@ const EMOJI = {
   aiModels: "🧪",
   githubStars: "🔥",
   productHunt: "🚀",
+  reddit: "🤖",
+  juejin: "📝",
+  segmentfault: "❓",
 
   // 情绪图标
   fearGreed: {

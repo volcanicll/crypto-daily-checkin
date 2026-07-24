@@ -26,8 +26,11 @@
 | **AI 行业资讯** | TechCrunch, Wired AI, MIT Tech Review, Google AI Blog, OpenAI Blog, ArXiv CS.AI |
 | **Agent Code 前沿** | GitHub Blog, Anthropic, OpenAI, Smol AI, Reddit, Lobste.rs, Hacker News, GitHub Trending |
 | **V2EX 精选** | V2EX 热门话题（Hacker News 风格评分算法） |
-| **宏观金融新闻** 🆕 | CNBC Markets, Reuters Business, Bloomberg Markets |
+| **宏观金融新闻** | CNBC Markets, Reuters Business, Bloomberg Markets |
 | **X/Twitter 热门** | Claude Code, Cursor AI, GitHub Copilot, Vibe Coding, LLM Agents, AI Code Assistant |
+| **Reddit 技术社区** 🆕 | r/programming, r/webdev, r/javascript, r/Python, r/rust, r/golang, r/MachineLearning, r/LocalLLaMA, r/datascience, r/devops, r/docker, r/kubernetes, r/blockchain, r/cybersecurity 等 20+ 子版块 |
+| **掘金技术社区** 🆕 | 中文开发者社区热门文章（前端、后端、AI、DevOps 等） |
+| **SegmentFault 技术问答** 🆕 | 中文技术问答社区热门问题与技术文章 |
 | **自动翻译** | 所有英文内容自动翻译为中文（并行优化）|
 
 ### 🤖 AI 智能功能
@@ -111,7 +114,10 @@ src/
 │   │   ├── agentCodeNews.js   # Agent Code 前沿资讯
 │   │   ├── v2exNews.js        # V2EX 精选
 │   │   ├── xTwitterNews.js    # X/Twitter 热门
-│   │   └── macroNews.js       # 宏观金融新闻 🆕
+│   │   ├── macroNews.js       # 宏观金融新闻 🆕
+│   │   ├── redditNews.js      # Reddit 技术社区 🆕
+│   │   ├── juejinNews.js      # 掘金技术社区 🆕
+│   │   └── segmentfaultNews.js # SegmentFault 技术问答 🆕
 │   ├── llm/
 │   │   ├── LLMService.js      # LLM 服务
 │   │   └── NewsHighlightsService.js  # 新闻亮点服务 🆕
@@ -129,7 +135,10 @@ src/
         ├── V2exFormatter.js
         ├── XTwitterFormatter.js
         ├── MacroFormatter.js   # 宏观新闻格式化器 🆕
-        └── NewsHighlightsFormatter.js  # 新闻亮点格式化器 🆕
+        ├── NewsHighlightsFormatter.js  # 新闻亮点格式化器 🆕
+        ├── RedditFormatter.js  # Reddit 格式化器 🆕
+        ├── JuejinFormatter.js  # 掘金格式化器 🆕
+        └── SegmentFaultFormatter.js  # SegmentFault 格式化器 🆕
 ```
 
 ---
@@ -147,11 +156,17 @@ src/
 | `MODULE_V2EX`                 | true  | V2EX 精选           |
 | `MODULE_MACRO_NEWS`           | true  | 宏观金融新闻 🆕      |
 | `MODULE_X_TWITTER`            | false | X/Twitter 热门      |
+| `MODULE_REDDIT`               | true  | Reddit 技术社区 🆕    |
+| `MODULE_JUEJIN`               | true  | 掘金技术社区 🆕      |
+| `MODULE_SEGMENTFAULT`         | true  | SegmentFault 技术问答 🆕 |
 | `MODULE_NEWS_HIGHLIGHTS`      | true  | AI 新闻亮点 🆕      |
 | `MODULE_AI_RECOMMENDATIONS`   | true  | AI 精选推荐         |
 | `MODULE_LLM_COMMENTARY`       | true  | LLM 智能锐评        |
 | `MODULE_WEATHER`              | false | 天气预报            |
 | `MODULE_QUOTE`                | false | 每日一言           |
+| `MODULE_REDDIT`               | true  | Reddit 技术社区 🆕    |
+| `MODULE_JUEJIN`               | true  | 掘金技术社区 🆕      |
+| `MODULE_SEGMENTFAULT`         | true  | SegmentFault 技术问答 🆕 |
 
 ### AI 配置 🆕
 

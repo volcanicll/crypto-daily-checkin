@@ -6,6 +6,9 @@ const { getAgentCodeNews } = require("./tech/agentCodeNews");
 const { getXTwitterNews } = require("./tech/xTwitterNews");
 const { getV2exNews } = require("./tech/v2exNews");
 const { getMacroNews } = require("./tech/macroNews");
+const { getRedditNews } = require("./tech/redditNews");
+const { getJuejinNews } = require("./tech/juejinNews");
+const { getSegmentFaultNews } = require("./tech/segmentfaultNews");
 const { getFearAndGreedIndex } = require("./crypto/sentiment");
 const { getAIModelsNews } = require("./tech/aiModelsTracker");
 const { getGitHubNewStars } = require("./tech/githubNewStars");
@@ -27,6 +30,9 @@ const { formatCommentary } = require("../utils/formatters/CommentaryFormatter");
 const { formatAIModels } = require("../utils/formatters/AIModelsFormatter");
 const { formatGitHubStars } = require("../utils/formatters/GitHubStarsFormatter");
 const { formatProductHunt } = require("../utils/formatters/ProductHuntFormatter");
+const { formatReddit } = require("../utils/formatters/RedditFormatter");
+const { formatJuejin } = require("../utils/formatters/JuejinFormatter");
+const { formatSegmentFault } = require("../utils/formatters/SegmentFaultFormatter");
 const {
   formatAiRecommendations,
 } = require("../utils/formatters/AiRecommendationsFormatter");
@@ -145,6 +151,27 @@ class DailyReportGenerator {
         });
       }
 
+      if (contentModules.reddit) {
+        dataPromises.reddit = getRedditNews().catch((e) => {
+          console.error("Reddit fetch error", e);
+          return [];
+        });
+      }
+
+      if (contentModules.juejin) {
+        dataPromises.juejin = getJuejinNews().catch((e) => {
+          console.error("Juejin fetch error", e);
+          return [];
+        });
+      }
+
+      if (contentModules.segmentfault) {
+        dataPromises.segmentfault = getSegmentFaultNews().catch((e) => {
+          console.error("SegmentFault fetch error", e);
+          return [];
+        });
+      }
+
       // 等待所有数据获取完成
       const keys = Object.keys(dataPromises);
       const values = await Promise.all(Object.values(dataPromises));
@@ -236,6 +263,21 @@ class DailyReportGenerator {
         formattedParts.push(formatProductHunt(data.productHunt));
       }
 
+      // Reddit 技术社区
+      if (contentModules.reddit && data.reddit) {
+        formattedParts.push(formatReddit(data.reddit));
+      }
+
+      // 掘金技术社区
+      if (contentModules.juejin && data.juejin) {
+        formattedParts.push(formatJuejin(data.juejin));
+      }
+
+      // SegmentFault 技术问答
+      if (contentModules.segmentfault && data.segmentfault) {
+        formattedParts.push(formatSegmentFault(data.segmentfault));
+      }
+
       if (contentModules.v2ex && data.v2ex) {
         formattedParts.push(formatV2ex(data.v2ex));
       }
@@ -273,6 +315,9 @@ class DailyReportGenerator {
           ...(data.aiModels || []),
           ...(data.githubStars || []),
           ...(data.productHunt || []),
+          ...(data.reddit || []),
+          ...(data.juejin || []),
+          ...(data.segmentfault || []),
           ...horizonNews,
         ];
         if (allNews.length > 0) {

@@ -1,5 +1,56 @@
 # 更新日志
 
+## [2026-07-23] v2.1 更新 - 扩展技术社区覆盖 🌐
+
+### 🆕 新增功能
+
+#### 技术社区模块扩展
+- **Reddit 技术社区模块**
+  - 新增 20+ 技术相关子版块覆盖
+  - 支持编程、AI/ML、DevOps、新兴技术、开源等多个分类
+  - 包含 r/programming, r/webdev, r/javascript, r/Python, r/rust, r/golang, r/MachineLearning, r/LocalLLaMA, r/datascience, r/devops, r/docker, r/kubernetes, r/blockchain, r/cybersecurity 等
+  - 自动分类和表情符号标注
+
+- **掘金技术社区模块**
+  - 中文开发者社区热门文章聚合
+  - 支持前端、后端、AI、DevOps 等技术分类
+  - 按热度排序（点赞+评论+浏览量）
+  - 无需翻译，直接展示中文内容
+
+- **SegmentFault 技术问答模块**
+  - 中文技术问答社区热门问题
+  - 技术文章推荐
+  - 区分问题和文章类型
+
+### 🔧 改进优化
+
+#### 代码架构
+- 新增独立的服务模块：`redditNews.js`, `juejinNews.js`, `segmentfaultNews.js`
+- 新增对应的格式化器：`RedditFormatter.js`, `JuejinFormatter.js`, `SegmentFaultFormatter.js`
+- 模块化配置，支持通过环境变量灵活控制
+
+#### 文档更新
+- 更新 README.md，添加新模块说明
+- 更新 .env.example，添加新模块配置选项
+- 完善项目结构文档
+
+### 📋 配置说明
+
+新增环境变量配置：
+```env
+MODULE_REDDIT=true      # Reddit 技术社区（默认启用）
+MODULE_JUEJIN=true      # 掘金技术社区（默认启用）
+MODULE_SEGMENTFAULT=true # SegmentFault 技术问答（默认启用）
+```
+
+### ⚠️ 注意事项
+
+- Reddit 有请求频率限制，已配置自动重试机制
+- 掘金和 SegmentFault 为中文内容，无需翻译
+- 所有新模块均支持并行获取，不影响整体性能
+
+---
+
 ## [2026-03-24] v2.0 重大更新 - TechDaily 重塑 🚀
 
 > **项目重命名**: `crypto-daily-checkin` → `tech-daily`

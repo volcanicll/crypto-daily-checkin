@@ -55,6 +55,15 @@ const contentModules = {
 
   // Product Hunt 新品模块 (默认禁用，需配置 PRODUCTHUNT_API_TOKEN)
   productHunt: process.env.MODULE_PRODUCT_HUNT === "true",
+
+  // Reddit 技术社区模块 (默认启用)
+  reddit: process.env.MODULE_REDDIT !== "false",
+
+  // 掘金技术社区模块 (默认启用)
+  juejin: process.env.MODULE_JUEJIN !== "false",
+
+  // SegmentFault 技术问答模块 (默认启用)
+  segmentfault: process.env.MODULE_SEGMENTFAULT !== "false",
 };
 
 /**
