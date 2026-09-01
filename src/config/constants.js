@@ -100,6 +100,9 @@ const LLM_CONFIG = {
 
   // 默认风格
   defaultStyle: "humor",
+
+  // API 请求超时（毫秒）
+  requestTimeout: 60000,
 };
 
 /**
@@ -208,6 +211,9 @@ const EMOJI = {
   reddit: "🤖",
   juejin: "📝",
   segmentfault: "❓",
+  leetcode: "🧩",
+  techHistory: "📜",
+  security: "🛡️",
 
   // 情绪图标
   fearGreed: {

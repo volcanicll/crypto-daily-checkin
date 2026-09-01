@@ -47,5 +47,8 @@ jobs:
       - name: install dependencies
         run: bun install
 
+      - name: run tests
+        run: bun run test
+
       - name: run js
         run: bun run start

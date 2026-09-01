@@ -5,7 +5,8 @@
   "main": "src/app.js",
   "scripts": {
     "start": "bun src/app.js",
-    "dev": "bun --watch src/app.js"
+    "dev": "bun --watch src/app.js",
+    "test": "bun test"
   },
   "keywords": [
     "tech",
@@ -23,10 +24,6 @@
     "axios": "^1.6.0",
     "cheerio": "^1.1.2",
     "dotenv": "^16.4.7",
-    "google-translate-api-x": "^10.7.2",
-    "node-fetch": "^3.3.2"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.0"
+    "google-translate-api-x": "^10.7.2"
   }
 }

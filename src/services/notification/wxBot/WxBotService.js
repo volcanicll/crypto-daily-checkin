@@ -1,4 +1,4 @@
-const { BASE_URL } = require("../../../config/constants");
+const { BASE_URL, API_CONFIG } = require("../../../config/constants");
 const { env } = require("../../../config/env");
 
 class WxBotService {
@@ -34,6 +34,7 @@ class WxBotService {
         headers: {
           "Content-Type": "application/json",
         },
+        signal: AbortSignal.timeout(API_CONFIG.timeout),
       }
     );
     const result = await response.json();
@@ -49,6 +50,7 @@ class WxBotService {
           touser: "XiangCan" || "@all",
           ...config,
         }),
+        signal: AbortSignal.timeout(API_CONFIG.timeout),
       }
     );
     return response.json();

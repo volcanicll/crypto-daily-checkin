@@ -1,5 +1,5 @@
 const crypto = require("crypto");
-const { BASE_URL } = require("../../../config/constants");
+const { BASE_URL, API_CONFIG } = require("../../../config/constants");
 const { env } = require("../../../config/env");
 const { splitMessageByLength } = require("../../../utils/messageSplitter");
 
@@ -48,6 +48,7 @@ class DingTalkBotService {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(config),
+      signal: AbortSignal.timeout(API_CONFIG.timeout),
     });
 
     return response.json();

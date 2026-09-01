@@ -1,4 +1,4 @@
-const { BASE_URL } = require("../../../config/constants");
+const { BASE_URL, API_CONFIG } = require("../../../config/constants");
 const { env } = require("../../../config/env");
 
 // 微信群机器人文本消息限制 2048 字节，预留一些空间
@@ -104,6 +104,7 @@ class GroupBotService {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(config),
+        signal: AbortSignal.timeout(API_CONFIG.timeout),
       }
     );
 

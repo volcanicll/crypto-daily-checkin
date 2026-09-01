@@ -51,6 +51,7 @@ class NewsHighlightsService {
           max_tokens: LLM_CONFIG.maxTokens.highlights,
           temperature: HIGHLIGHTS_PROMPT.temperature,
         }),
+        signal: AbortSignal.timeout(LLM_CONFIG.requestTimeout),
       });
 
       if (!response.ok) {

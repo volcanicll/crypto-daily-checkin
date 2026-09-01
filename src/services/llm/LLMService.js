@@ -121,6 +121,7 @@ class LLMService {
         max_tokens: maxTokens,
         temperature: temperature,
       }),
+      signal: AbortSignal.timeout(LLM_CONFIG.requestTimeout),
     });
 
     if (!response.ok) {
@@ -175,29 +176,16 @@ class LLMService {
 例如: 3|重大更新，将影响所有开发者
 不要输出其他内容。`;
 
-      const response = await fetch(`${this.baseUrl}/chat/completions`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.apiKey}`,
-        },
-        body: JSON.stringify({
-          model: this.model,
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: `资讯列表：\n${newsList}` },
-          ],
-          max_tokens: 300,
-          temperature: 0.3,
-        }),
-      });
+      const content = await this.callAPI(
+        `资讯列表：\n${newsList}`,
+        systemPrompt,
+        LLM_CONFIG.maxTokens.recommendations,
+        LLM_CONFIG.temperature.recommendations
+      );
 
-      if (!response.ok) {
-        throw new Error(`API 请求失败: ${response.status}`);
+      if (!content) {
+        return [];
       }
-
-      const data = await response.json();
-      const content = data.choices?.[0]?.message?.content?.trim() || "";
 
       // 解析 AI 返回的推荐
       const recommendations = [];

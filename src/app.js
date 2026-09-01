@@ -15,18 +15,31 @@ async function run() {
     // 生成日报内容
     const messageContent = await dailyReportGenerator.generateDailyMessage();
 
+    if (!messageContent || messageContent.includes("消息生成失败")) {
+      process.exitCode = 1;
+      console.error("日报生成失败，终止通知发送");
+      return;
+    }
+
     // 根据配置动态启用通知服务
     const enabledServices = getEnabledNotifications();
     console.log("启用的通知服务:", enabledServices.join(", ") || "无");
 
     const notifications = [];
+    let failedDeliveries = 0;
 
     if (notificationServices.telegram) {
       notifications.push(
         telegramBotService
           .sendMessage(messageContent)
-          .then(() => console.log("✅ Telegram 发送完成"))
-          .catch((e) => console.error("❌ Telegram 发送失败:", e.message))
+          .then((ok) => {
+            if (ok === false) failedDeliveries++;
+            console.log("✅ Telegram 发送完成");
+          })
+          .catch((e) => {
+            failedDeliveries++;
+            console.error("❌ Telegram 发送失败:", e.message);
+          })
       );
     }
 
@@ -35,7 +48,10 @@ async function run() {
         dingTalkBotService
           .sendMarkdown("每日播报", messageContent)
           .then(() => console.log("✅ 钉钉 发送完成"))
-          .catch((e) => console.error("❌ 钉钉 发送失败:", e.message))
+          .catch((e) => {
+            failedDeliveries++;
+            console.error("❌ 钉钉 发送失败:", e.message);
+          })
       );
     }
 
@@ -44,7 +60,10 @@ async function run() {
         groupBotService
           .sendMarkdown(messageContent)
           .then(() => console.log("✅ 企微群机器人 发送完成"))
-          .catch((e) => console.error("❌ 企微群机器人 发送失败:", e.message))
+          .catch((e) => {
+            failedDeliveries++;
+            console.error("❌ 企微群机器人 发送失败:", e.message);
+          })
       );
     }
 
@@ -53,7 +72,10 @@ async function run() {
         wxBotService
           .sendMessage(messageContent)
           .then(() => console.log("✅ 企微应用 发送完成"))
-          .catch((e) => console.error("❌ 企微应用 发送失败:", e.message))
+          .catch((e) => {
+            failedDeliveries++;
+            console.error("❌ 企微应用 发送失败:", e.message);
+          })
       );
     }
 
@@ -61,11 +83,16 @@ async function run() {
       console.warn("⚠️ 没有启用任何通知服务");
     } else {
       await Promise.all(notifications);
+      if (failedDeliveries > 0) {
+        process.exitCode = 1;
+        console.error(`${failedDeliveries} 个通知渠道发送失败`);
+      }
     }
 
     console.log("执行完成！");
   } catch (error) {
     console.error("执行出错：", error);
+    process.exitCode = 1;
   }
 }
 
