@@ -31,6 +31,9 @@
 | **Reddit 技术社区** 🆕 | r/programming, r/webdev, r/javascript, r/Python, r/rust, r/golang, r/MachineLearning, r/LocalLLaMA, r/datascience, r/devops, r/docker, r/kubernetes, r/blockchain, r/cybersecurity 等 20+ 子版块 |
 | **掘金技术社区** 🆕 | 中文开发者社区热门文章（前端、后端、AI、DevOps 等） |
 | **SegmentFault 技术问答** 🆕 | 中文技术问答社区热门问题与技术文章 |
+| **安全雷达** ✨ | The Hacker News 网络安全资讯（漏洞、攻防、数据安全，自动翻译） |
+| **LeetCode 每日一题** ✨ | 力扣中国每日官方题目，含难度与通过率 |
+| **科技史上的今天** ✨ | Wikipedia 历史上的今天，精选科技事件 |
 | **自动翻译** | 所有英文内容自动翻译为中文（并行优化）|
 
 ### 🤖 AI 智能功能
@@ -164,9 +167,9 @@ src/
 | `MODULE_LLM_COMMENTARY`       | true  | LLM 智能锐评        |
 | `MODULE_WEATHER`              | false | 天气预报            |
 | `MODULE_QUOTE`                | false | 每日一言           |
-| `MODULE_REDDIT`               | true  | Reddit 技术社区 🆕    |
-| `MODULE_JUEJIN`               | true  | 掘金技术社区 🆕      |
-| `MODULE_SEGMENTFAULT`         | true  | SegmentFault 技术问答 🆕 |
+| `MODULE_LEETCODE`             | true  | LeetCode 每日一题 ✨ |
+| `MODULE_TECH_HISTORY`         | true  | 科技史上的今天 ✨    |
+| `MODULE_SECURITY_RADAR`       | true  | 安全雷达 ✨         |
 
 ### AI 配置 🆕
 

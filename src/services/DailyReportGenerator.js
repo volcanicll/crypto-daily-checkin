@@ -9,6 +9,9 @@ const { getMacroNews } = require("./tech/macroNews");
 const { getRedditNews } = require("./tech/redditNews");
 const { getJuejinNews } = require("./tech/juejinNews");
 const { getSegmentFaultNews } = require("./tech/segmentfaultNews");
+const { getLeetCodeDaily } = require("./tech/leetcodeDaily");
+const { getTechHistory } = require("./tech/techHistory");
+const { getSecurityRadar } = require("./tech/securityRadar");
 const { getFearAndGreedIndex } = require("./crypto/sentiment");
 const { getAIModelsNews } = require("./tech/aiModelsTracker");
 const { getGitHubNewStars } = require("./tech/githubNewStars");
@@ -33,6 +36,9 @@ const { formatProductHunt } = require("../utils/formatters/ProductHuntFormatter"
 const { formatReddit } = require("../utils/formatters/RedditFormatter");
 const { formatJuejin } = require("../utils/formatters/JuejinFormatter");
 const { formatSegmentFault } = require("../utils/formatters/SegmentFaultFormatter");
+const { formatLeetCode } = require("../utils/formatters/LeetCodeFormatter");
+const { formatTechHistory } = require("../utils/formatters/TechHistoryFormatter");
+const { formatSecurityRadar } = require("../utils/formatters/SecurityRadarFormatter");
 const {
   formatAiRecommendations,
 } = require("../utils/formatters/AiRecommendationsFormatter");
@@ -58,6 +64,23 @@ class DailyReportGenerator {
       console.error("Error fetching crypto info:", error);
       return { marketData: [], newsData: [], sentimentData: null };
     }
+  }
+
+  /**
+   * 将 Horizon 输出映射为统一新闻条目（供亮点提取与 AI 推荐复用）
+   * @private
+   */
+  _mapHorizonNews(data) {
+    if (!data || !data.horizon) return [];
+    return horizonService
+      .parseHorizonOutput(data.horizon.zh || data.horizon.en)
+      .map((item) => ({
+        title: item.title,
+        description: item.summary,
+        url: item.url,
+        source: "Horizon",
+        author: item.tags.join(", "),
+      }));
   }
 
   /**
@@ -172,6 +195,27 @@ class DailyReportGenerator {
         });
       }
 
+      if (contentModules.leetcode) {
+        dataPromises.leetcode = getLeetCodeDaily().catch((e) => {
+          console.error("LeetCode daily fetch error", e);
+          return null;
+        });
+      }
+
+      if (contentModules.techHistory) {
+        dataPromises.techHistory = getTechHistory().catch((e) => {
+          console.error("Tech history fetch error", e);
+          return [];
+        });
+      }
+
+      if (contentModules.securityRadar) {
+        dataPromises.securityRadar = getSecurityRadar().catch((e) => {
+          console.error("Security radar fetch error", e);
+          return [];
+        });
+      }
+
       // 等待所有数据获取完成
       const keys = Object.keys(dataPromises);
       const values = await Promise.all(Object.values(dataPromises));
@@ -196,18 +240,6 @@ class DailyReportGenerator {
       let highlights = null;
       if (contentModules.newsHighlights) {
         // Horizon的新闻纳入亮点提取
-        let horizonNews = [];
-        if (data.horizon) {
-          horizonNews = horizonService.parseHorizonOutput(
-            data.horizon.zh || data.horizon.en
-          ).map(item => ({
-            title: item.title,
-            description: item.summary,
-            url: item.url,
-            source: "Horizon",
-            author: item.tags.join(", "),
-          }));
-        }
         const allNews = [
           ...(data.aiNews || []),
           ...(data.agentCode || []),
@@ -217,7 +249,7 @@ class DailyReportGenerator {
           ...(data.aiModels || []),
           ...(data.githubStars || []),
           ...(data.productHunt || []),
-          ...horizonNews,
+          ...this._mapHorizonNews(data),
         ];
         if (allNews.length > 0) {
           console.log("正在生成新闻亮点...");
@@ -278,12 +310,27 @@ class DailyReportGenerator {
         formattedParts.push(formatSegmentFault(data.segmentfault));
       }
 
+      // 安全雷达
+      if (contentModules.securityRadar && data.securityRadar) {
+        formattedParts.push(formatSecurityRadar(data.securityRadar));
+      }
+
       if (contentModules.v2ex && data.v2ex) {
         formattedParts.push(formatV2ex(data.v2ex));
       }
 
       if (contentModules.xTwitter && data.xTwitter) {
         formattedParts.push(formatXTwitter(data.xTwitter));
+      }
+
+      // LeetCode 每日一题
+      if (contentModules.leetcode && data.leetcode) {
+        formattedParts.push(formatLeetCode(data.leetcode));
+      }
+
+      // 科技史上的今天
+      if (contentModules.techHistory && data.techHistory) {
+        formattedParts.push(formatTechHistory(data.techHistory));
       }
 
       // 并行执行 LLM 调用（commentary 和 recommendations）
@@ -294,18 +341,6 @@ class DailyReportGenerator {
       // AI 精选推荐
       if (contentModules.aiRecommendations) {
         // Horizon的新闻纳入AI推荐
-        let horizonNews = [];
-        if (data.horizon) {
-          horizonNews = horizonService.parseHorizonOutput(
-            data.horizon.zh || data.horizon.en
-          ).map(item => ({
-            title: item.title,
-            description: item.summary,
-            url: item.url,
-            source: "Horizon",
-            author: item.tags.join(", "),
-          }));
-        }
         const allNews = [
           ...(data.aiNews || []),
           ...(data.agentCode || []),
@@ -318,7 +353,7 @@ class DailyReportGenerator {
           ...(data.reddit || []),
           ...(data.juejin || []),
           ...(data.segmentfault || []),
-          ...horizonNews,
+          ...this._mapHorizonNews(data),
         ];
         if (allNews.length > 0) {
           console.log("正在生成 AI 精选推荐...");

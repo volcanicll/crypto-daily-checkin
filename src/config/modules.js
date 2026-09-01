@@ -64,6 +64,15 @@ const contentModules = {
 
   // SegmentFault 技术问答模块 (默认启用)
   segmentfault: process.env.MODULE_SEGMENTFAULT !== "false",
+
+  // LeetCode 每日一题模块 (默认启用)
+  leetcode: process.env.MODULE_LEETCODE !== "false",
+
+  // 科技史上的今天模块 (默认启用)
+  techHistory: process.env.MODULE_TECH_HISTORY !== "false",
+
+  // 每日安全雷达模块 (默认启用)
+  securityRadar: process.env.MODULE_SECURITY_RADAR !== "false",
 };
 
 /**
