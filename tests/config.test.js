@@ -1,4 +1,36 @@
 const { describe, it, expect } = require("bun:test");
+
+// 清除环境变量，确保测试验证的是配置的默认行为而非 CI 环境中的 secret 值
+const _envKeys = [
+  "NOTIFY_TELEGRAM",
+  "NOTIFY_DINGTALK",
+  "NOTIFY_WX_BOT",
+  "NOTIFY_WX_APP",
+  "MODULE_GOLD",
+  "MODULE_CRYPTO",
+  "MODULE_AI_NEWS",
+  "MODULE_HORIZON",
+  "MODULE_V2EX",
+  "MODULE_MACRO_NEWS",
+  "MODULE_NEWS_HIGHLIGHTS",
+  "MODULE_X_TWITTER",
+  "MODULE_AI_RECOMMENDATIONS",
+  "MODULE_LLM_COMMENTARY",
+  "MODULE_WEATHER",
+  "MODULE_QUOTE",
+  "MODULE_AI_MODELS",
+  "MODULE_GITHUB_STARS",
+  "MODULE_PRODUCT_HUNT",
+  "MODULE_REDDIT",
+  "MODULE_JUEJIN",
+  "MODULE_SEGMENTFAULT",
+  "MODULE_AGENT_CODE",
+  "MODULE_LEETCODE",
+  "MODULE_TECH_HISTORY",
+  "MODULE_SECURITY_RADAR",
+];
+_envKeys.forEach((k) => delete process.env[k]);
+
 const {
   contentModules,
   notificationServices,
